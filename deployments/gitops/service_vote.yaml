@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    openshift.io/generated-by: OpenShiftNewApp
+  creationTimestamp: "2020-02-01T07:38:01Z"
+  labels:
+    app: vote
+  name: vote
+  namespace: voting-application
+  resourceVersion: "52048"
+  selfLink: /api/v1/namespaces/voting-application/services/vote
+  uid: c66f1050-44c5-11ea-bfc6-0242ac110037
+spec:
+  clusterIP: 172.30.201.141
+  ports:
+  - name: 80-tcp
+    port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: vote
+    deploymentconfig: vote
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}

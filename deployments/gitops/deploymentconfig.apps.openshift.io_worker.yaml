@@ -1,0 +1,88 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  annotations:
+    openshift.io/generated-by: OpenShiftNewApp
+  creationTimestamp: "2020-02-01T07:38:58Z"
+  generation: 2
+  labels:
+    app: worker
+  name: worker
+  namespace: voting-application
+  resourceVersion: "51687"
+  selfLink: /apis/apps.openshift.io/v1/namespaces/voting-application/deploymentconfigs/worker
+  uid: e8734ff7-44c5-11ea-bfc6-0242ac110037
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    app: worker
+    deploymentconfig: worker
+  strategy:
+    activeDeadlineSeconds: 21600
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
+  template:
+    metadata:
+      annotations:
+        openshift.io/generated-by: OpenShiftNewApp
+      creationTimestamp: null
+      labels:
+        app: worker
+        deploymentconfig: worker
+    spec:
+      containers:
+      - image: docker-registry.default.svc:5000/voting-application/worker@sha256:a18c33fac46c60766b07eef81d6b184082dc52ede1e088f6c639b546274925f4
+        imagePullPolicy: Always
+        name: worker
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+  test: false
+  triggers:
+  - type: ConfigChange
+  - imageChangeParams:
+      automatic: true
+      containerNames:
+      - worker
+      from:
+        kind: ImageStreamTag
+        name: worker:latest
+        namespace: voting-application
+      lastTriggeredImage: docker-registry.default.svc:5000/voting-application/worker@sha256:a18c33fac46c60766b07eef81d6b184082dc52ede1e088f6c639b546274925f4
+    type: ImageChange
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2020-02-01T07:40:32Z"
+    lastUpdateTime: "2020-02-01T07:40:32Z"
+    message: Deployment config has minimum availability.
+    status: "True"
+    type: Available
+  - lastTransitionTime: "2020-02-01T07:40:33Z"
+    lastUpdateTime: "2020-02-01T07:40:33Z"
+    message: replication controller "worker-1" successfully rolled out
+    reason: NewReplicationControllerAvailable
+    status: "True"
+    type: Progressing
+  details:
+    causes:
+    - type: ConfigChange
+    message: config change
+  latestVersion: 1
+  observedGeneration: 2
+  readyReplicas: 1
+  replicas: 1
+  unavailableReplicas: 0
+  updatedReplicas: 1

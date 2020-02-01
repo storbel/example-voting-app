@@ -1,0 +1,31 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  annotations:
+    openshift.io/host.generated: "true"
+  creationTimestamp: "2020-02-01T07:38:52Z"
+  labels:
+    app: result
+  name: result
+  namespace: voting-application
+  resourceVersion: "51310"
+  selfLink: /apis/route.openshift.io/v1/namespaces/voting-application/routes/result
+  uid: e49ae7be-44c5-11ea-bfc6-0242ac110037
+spec:
+  host: result-voting-application.2886795319-80-cykoria05.environments.katacoda.com
+  port:
+    targetPort: 80-tcp
+  to:
+    kind: Service
+    name: result
+    weight: 100
+  wildcardPolicy: None
+status:
+  ingress:
+  - conditions:
+    - lastTransitionTime: "2020-02-01T07:38:52Z"
+      status: "True"
+      type: Admitted
+    host: result-voting-application.2886795319-80-cykoria05.environments.katacoda.com
+    routerName: router
+    wildcardPolicy: None

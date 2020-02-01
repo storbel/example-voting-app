@@ -1,0 +1,94 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  annotations:
+    openshift.io/generated-by: OpenShiftNewApp
+  creationTimestamp: "2020-02-01T07:38:47Z"
+  generation: 2
+  labels:
+    app: result
+  name: result
+  namespace: voting-application
+  resourceVersion: "51724"
+  selfLink: /apis/apps.openshift.io/v1/namespaces/voting-application/deploymentconfigs/result
+  uid: e2077cc4-44c5-11ea-bfc6-0242ac110037
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    app: result
+    deploymentconfig: result
+  strategy:
+    activeDeadlineSeconds: 21600
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
+  template:
+    metadata:
+      annotations:
+        openshift.io/generated-by: OpenShiftNewApp
+      creationTimestamp: null
+      labels:
+        app: result
+        deploymentconfig: result
+    spec:
+      containers:
+      - env:
+        - name: PORT
+          value: "8080"
+        image: docker-registry.default.svc:5000/voting-application/result@sha256:03d58eee0a86b7beb54f67e95b0619983d842466109450d759cea595968bfa9a
+        imagePullPolicy: Always
+        name: result
+        ports:
+        - containerPort: 80
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+  test: false
+  triggers:
+  - type: ConfigChange
+  - imageChangeParams:
+      automatic: true
+      containerNames:
+      - result
+      from:
+        kind: ImageStreamTag
+        name: result:latest
+        namespace: voting-application
+      lastTriggeredImage: docker-registry.default.svc:5000/voting-application/result@sha256:03d58eee0a86b7beb54f67e95b0619983d842466109450d759cea595968bfa9a
+    type: ImageChange
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2020-02-01T07:40:37Z"
+    lastUpdateTime: "2020-02-01T07:40:37Z"
+    message: Deployment config has minimum availability.
+    status: "True"
+    type: Available
+  - lastTransitionTime: "2020-02-01T07:40:38Z"
+    lastUpdateTime: "2020-02-01T07:40:38Z"
+    message: replication controller "result-1" successfully rolled out
+    reason: NewReplicationControllerAvailable
+    status: "True"
+    type: Progressing
+  details:
+    causes:
+    - type: ConfigChange
+    message: config change
+  latestVersion: 1
+  observedGeneration: 2
+  readyReplicas: 1
+  replicas: 1
+  unavailableReplicas: 0
+  updatedReplicas: 1
