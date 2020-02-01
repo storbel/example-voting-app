@@ -1,0 +1,48 @@
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  annotations:
+    openshift.io/generated-by: OpenShiftNewApp
+  creationTimestamp: "2020-02-01T07:38:58Z"
+  labels:
+    app: worker
+  name: worker
+  namespace: voting-application
+  resourceVersion: "51381"
+  selfLink: /apis/build.openshift.io/v1/namespaces/voting-application/buildconfigs/worker
+  uid: e8697aaa-44c5-11ea-bfc6-0242ac110037
+spec:
+  failedBuildsHistoryLimit: 5
+  nodeSelector: null
+  output:
+    to:
+      kind: ImageStreamTag
+      name: worker:latest
+  postCommit: {}
+  resources: {}
+  runPolicy: Serial
+  source:
+    contextDir: worker
+    git:
+      uri: https://github.com/storbel/example-voting-app.git
+    type: Git
+  strategy:
+    dockerStrategy:
+      from:
+        kind: ImageStreamTag
+        name: java:openjdk-8-jdk-alpine
+    type: Docker
+  successfulBuildsHistoryLimit: 5
+  triggers:
+  - github:
+      secret: odENqmG4PSH2yIcJ-rxB
+    type: GitHub
+  - generic:
+      secret: 8RJbRNhUu_zRH5ayHC7J
+    type: Generic
+  - type: ConfigChange
+  - imageChange:
+      lastTriggeredImageID: java@sha256:d49bf8c44670834d3dade17f8b84d709e7db47f1887f671a0e098bafa9bae49f
+    type: ImageChange
+status:
+  lastVersion: 1
