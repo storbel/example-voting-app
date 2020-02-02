@@ -1,1243 +1,6 @@
 apiVersion: v1
 items:
 - apiVersion: v1
-  kind: Pod
-  metadata:
-    annotations:
-      openshift.io/deployment-config.latest-version: "1"
-      openshift.io/deployment-config.name: postgresql
-      openshift.io/deployment.name: postgresql-1
-      openshift.io/generated-by: OpenShiftNewApp
-      openshift.io/scc: anyuid
-    creationTimestamp: null
-    generateName: postgresql-1-
-    labels:
-      app: db
-      deployment: postgresql-1
-      deploymentconfig: postgresql
-      name: postgresql
-    ownerReferences:
-    - apiVersion: v1
-      blockOwnerDeletion: true
-      controller: true
-      kind: ReplicationController
-      name: postgresql-1
-      uid: d992bed6-44c5-11ea-bfc6-0242ac110037
-  spec:
-    containers:
-    - env:
-      - name: DATABASE_SERVICE_NAME
-        value: db
-      - name: POSTGRESQL_DATABASE
-        value: postgres
-      - name: POSTGRESQL_PASSWORD
-        value: postgres_password
-      - name: POSTGRESQL_USER
-        value: postgres_user
-      image: docker-registry.default.svc:5000/openshift/postgresql@sha256:00adb16dd5f890e6b575ad073b5c272d0ff6ab5f862b09317bf4aed56dcee8d1
-      imagePullPolicy: IfNotPresent
-      livenessProbe:
-        exec:
-          command:
-          - /usr/libexec/check-container
-          - --live
-        failureThreshold: 3
-        initialDelaySeconds: 120
-        periodSeconds: 10
-        successThreshold: 1
-        timeoutSeconds: 10
-      name: postgresql
-      ports:
-      - containerPort: 5432
-        protocol: TCP
-      readinessProbe:
-        exec:
-          command:
-          - /usr/libexec/check-container
-        failureThreshold: 3
-        initialDelaySeconds: 5
-        periodSeconds: 10
-        successThreshold: 1
-        timeoutSeconds: 1
-      resources:
-        limits:
-          memory: 512Mi
-        requests:
-          memory: 512Mi
-      securityContext:
-        capabilities:
-          drop:
-          - MKNOD
-        privileged: false
-      terminationMessagePath: /dev/termination-log
-      terminationMessagePolicy: File
-      volumeMounts:
-      - mountPath: /var/lib/pgsql/data
-        name: postgresql-data
-      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
-        name: default-token-vlkqm
-        readOnly: true
-    dnsPolicy: ClusterFirst
-    imagePullSecrets:
-    - name: default-dockercfg-vz5sz
-    nodeName: master
-    nodeSelector:
-      node-role.kubernetes.io/compute: "true"
-    priority: 0
-    restartPolicy: Always
-    schedulerName: default-scheduler
-    securityContext:
-      seLinuxOptions:
-        level: s0:c17,c4
-    serviceAccount: default
-    serviceAccountName: default
-    terminationGracePeriodSeconds: 30
-    tolerations:
-    - effect: NoSchedule
-      key: node.kubernetes.io/memory-pressure
-      operator: Exists
-    volumes:
-    - emptyDir: {}
-      name: postgresql-data
-    - name: default-token-vlkqm
-      secret:
-        defaultMode: 420
-        secretName: default-token-vlkqm
-  status: {}
-- apiVersion: v1
-  kind: Pod
-  metadata:
-    annotations:
-      openshift.io/deployment-config.latest-version: "1"
-      openshift.io/deployment-config.name: redis
-      openshift.io/deployment.name: redis-1
-      openshift.io/generated-by: OpenShiftNewApp
-      openshift.io/scc: anyuid
-    creationTimestamp: null
-    generateName: redis-1-
-    labels:
-      app: redis
-      deployment: redis-1
-      deploymentconfig: redis
-      name: redis
-    ownerReferences:
-    - apiVersion: v1
-      blockOwnerDeletion: true
-      controller: true
-      kind: ReplicationController
-      name: redis-1
-      uid: cbfc404d-44c5-11ea-bfc6-0242ac110037
-  spec:
-    containers:
-    - env:
-      - name: REDIS_PASSWORD
-        value: redis_password
-      image: docker-registry.default.svc:5000/openshift/redis@sha256:06dbb609484330ec6be6090109f1fa16e936afcf975d1cbc5fff3e6c7cae7542
-      imagePullPolicy: IfNotPresent
-      livenessProbe:
-        failureThreshold: 3
-        initialDelaySeconds: 30
-        periodSeconds: 10
-        successThreshold: 1
-        tcpSocket:
-          port: 6379
-        timeoutSeconds: 1
-      name: redis
-      ports:
-      - containerPort: 6379
-        protocol: TCP
-      readinessProbe:
-        exec:
-          command:
-          - /bin/sh
-          - -i
-          - -c
-          - test "$(redis-cli -h 127.0.0.1 -a $REDIS_PASSWORD ping)" == "PONG"
-        failureThreshold: 3
-        initialDelaySeconds: 5
-        periodSeconds: 10
-        successThreshold: 1
-        timeoutSeconds: 1
-      resources:
-        limits:
-          memory: 512Mi
-        requests:
-          memory: 512Mi
-      securityContext:
-        capabilities:
-          drop:
-          - MKNOD
-        privileged: false
-      terminationMessagePath: /dev/termination-log
-      terminationMessagePolicy: File
-      volumeMounts:
-      - mountPath: /var/lib/redis/data
-        name: redis-data
-      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
-        name: default-token-vlkqm
-        readOnly: true
-    dnsPolicy: ClusterFirst
-    imagePullSecrets:
-    - name: default-dockercfg-vz5sz
-    nodeName: master
-    nodeSelector:
-      node-role.kubernetes.io/compute: "true"
-    priority: 0
-    restartPolicy: Always
-    schedulerName: default-scheduler
-    securityContext:
-      seLinuxOptions:
-        level: s0:c17,c4
-    serviceAccount: default
-    serviceAccountName: default
-    terminationGracePeriodSeconds: 30
-    tolerations:
-    - effect: NoSchedule
-      key: node.kubernetes.io/memory-pressure
-      operator: Exists
-    volumes:
-    - emptyDir: {}
-      name: redis-data
-    - name: default-token-vlkqm
-      secret:
-        defaultMode: 420
-        secretName: default-token-vlkqm
-  status: {}
-- apiVersion: v1
-  kind: Pod
-  metadata:
-    annotations:
-      openshift.io/deployment-config.latest-version: "1"
-      openshift.io/deployment-config.name: result
-      openshift.io/deployment.name: result-1
-      openshift.io/generated-by: OpenShiftNewApp
-      openshift.io/scc: anyuid
-    creationTimestamp: null
-    generateName: result-1-
-    labels:
-      app: result
-      deployment: result-1
-      deploymentconfig: result
-    ownerReferences:
-    - apiVersion: v1
-      blockOwnerDeletion: true
-      controller: true
-      kind: ReplicationController
-      name: result-1
-      uid: 1f67acec-44c6-11ea-bfc6-0242ac110037
-  spec:
-    containers:
-    - env:
-      - name: PORT
-        value: "8080"
-      image: docker-registry.default.svc:5000/voting-application/result@sha256:03d58eee0a86b7beb54f67e95b0619983d842466109450d759cea595968bfa9a
-      imagePullPolicy: Always
-      name: result
-      ports:
-      - containerPort: 80
-        protocol: TCP
-      resources: {}
-      securityContext:
-        capabilities:
-          drop:
-          - MKNOD
-      terminationMessagePath: /dev/termination-log
-      terminationMessagePolicy: File
-      volumeMounts:
-      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
-        name: default-token-vlkqm
-        readOnly: true
-    dnsPolicy: ClusterFirst
-    imagePullSecrets:
-    - name: default-dockercfg-vz5sz
-    nodeName: master
-    nodeSelector:
-      node-role.kubernetes.io/compute: "true"
-    priority: 0
-    restartPolicy: Always
-    schedulerName: default-scheduler
-    securityContext:
-      seLinuxOptions:
-        level: s0:c17,c4
-    serviceAccount: default
-    serviceAccountName: default
-    terminationGracePeriodSeconds: 30
-    volumes:
-    - name: default-token-vlkqm
-      secret:
-        defaultMode: 420
-        secretName: default-token-vlkqm
-  status: {}
-- apiVersion: v1
-  kind: Pod
-  metadata:
-    annotations:
-      openshift.io/build.name: result-1
-      openshift.io/scc: privileged
-    creationTimestamp: null
-    labels:
-      openshift.io/build.name: result-1
-    name: result-1-build
-    ownerReferences:
-    - apiVersion: build.openshift.io/v1
-      controller: true
-      kind: Build
-      name: result-1
-      uid: e260ccb4-44c5-11ea-bfc6-0242ac110037
-  spec:
-    containers:
-    - args:
-      - --loglevel=0
-      command:
-      - openshift-docker-build
-      env:
-      - name: BUILD
-        value: |
-          {"kind":"Build","apiVersion":"build.openshift.io/v1","metadata":{"name":"result-1","namespace":"voting-application","selfLink":"/apis/build.openshift.io/v1/namespaces/voting-application/builds/result-1","uid":"e260ccb4-44c5-11ea-bfc6-0242ac110037","resourceVersion":"51278","creationTimestamp":"2020-02-01T07:38:48Z","labels":{"app":"result","buildconfig":"result","openshift.io/build-config.name":"result","openshift.io/build.start-policy":"Serial"},"annotations":{"openshift.io/build-config.name":"result","openshift.io/build.number":"1"},"ownerReferences":[{"apiVersion":"build.openshift.io/v1","kind":"BuildConfig","name":"result","uid":"e1f88198-44c5-11ea-bfc6-0242ac110037","controller":true}]},"spec":{"serviceAccount":"builder","source":{"type":"Git","git":{"uri":"https://github.com/storbel/example-voting-app.git"},"contextDir":"result"},"strategy":{"type":"Docker","dockerStrategy":{"from":{"kind":"DockerImage","name":"node@sha256:fb4e332730514c393a78a3f0be6b6e1a7f7f3a63c9e670d6ccb0d54d3b9c4985"},"pullSecret":{"name":"builder-dockercfg-9sn6j"}}},"output":{"to":{"kind":"DockerImage","name":"docker-registry.default.svc:5000/voting-application/result:latest"},"pushSecret":{"name":"builder-dockercfg-9sn6j"}},"resources":{},"postCommit":{},"nodeSelector":null,"triggeredBy":[{"message":"Image change","imageChangeBuild":{"imageID":"node@sha256:fb4e332730514c393a78a3f0be6b6e1a7f7f3a63c9e670d6ccb0d54d3b9c4985","fromRef":{"kind":"ImageStreamTag","name":"node:5.11.0-slim"}}}]},"status":{"phase":"New","outputDockerImageReference":"docker-registry.default.svc:5000/voting-application/result:latest","config":{"kind":"BuildConfig","namespace":"voting-application","name":"result"},"output":{}}}
-      - name: SOURCE_REPOSITORY
-        value: https://github.com/storbel/example-voting-app.git
-      - name: SOURCE_URI
-        value: https://github.com/storbel/example-voting-app.git
-      - name: SOURCE_CONTEXT_DIR
-        value: result
-      - name: PUSH_DOCKERCFG_PATH
-        value: /var/run/secrets/openshift.io/push
-      - name: PULL_DOCKERCFG_PATH
-        value: /var/run/secrets/openshift.io/pull
-      image: docker.io/openshift/origin-docker-builder:v3.11.0
-      imagePullPolicy: IfNotPresent
-      name: docker-build
-      resources: {}
-      securityContext:
-        privileged: true
-      terminationMessagePath: /dev/termination-log
-      terminationMessagePolicy: FallbackToLogsOnError
-      volumeMounts:
-      - mountPath: /tmp/build
-        name: buildworkdir
-      - mountPath: /var/run/docker.sock
-        name: docker-socket
-      - mountPath: /var/run/crio/crio.sock
-        name: crio-socket
-      - mountPath: /var/run/secrets/openshift.io/push
-        name: builder-dockercfg-9sn6j-push
-        readOnly: true
-      - mountPath: /var/run/secrets/openshift.io/pull
-        name: builder-dockercfg-9sn6j-pull
-        readOnly: true
-      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
-        name: builder-token-gzhht
-        readOnly: true
-    dnsPolicy: ClusterFirst
-    imagePullSecrets:
-    - name: builder-dockercfg-9sn6j
-    initContainers:
-    - args:
-      - --loglevel=0
-      command:
-      - openshift-git-clone
-      env:
-      - name: BUILD
-        value: |
-          {"kind":"Build","apiVersion":"build.openshift.io/v1","metadata":{"name":"result-1","namespace":"voting-application","selfLink":"/apis/build.openshift.io/v1/namespaces/voting-application/builds/result-1","uid":"e260ccb4-44c5-11ea-bfc6-0242ac110037","resourceVersion":"51278","creationTimestamp":"2020-02-01T07:38:48Z","labels":{"app":"result","buildconfig":"result","openshift.io/build-config.name":"result","openshift.io/build.start-policy":"Serial"},"annotations":{"openshift.io/build-config.name":"result","openshift.io/build.number":"1"},"ownerReferences":[{"apiVersion":"build.openshift.io/v1","kind":"BuildConfig","name":"result","uid":"e1f88198-44c5-11ea-bfc6-0242ac110037","controller":true}]},"spec":{"serviceAccount":"builder","source":{"type":"Git","git":{"uri":"https://github.com/storbel/example-voting-app.git"},"contextDir":"result"},"strategy":{"type":"Docker","dockerStrategy":{"from":{"kind":"DockerImage","name":"node@sha256:fb4e332730514c393a78a3f0be6b6e1a7f7f3a63c9e670d6ccb0d54d3b9c4985"},"pullSecret":{"name":"builder-dockercfg-9sn6j"}}},"output":{"to":{"kind":"DockerImage","name":"docker-registry.default.svc:5000/voting-application/result:latest"},"pushSecret":{"name":"builder-dockercfg-9sn6j"}},"resources":{},"postCommit":{},"nodeSelector":null,"triggeredBy":[{"message":"Image change","imageChangeBuild":{"imageID":"node@sha256:fb4e332730514c393a78a3f0be6b6e1a7f7f3a63c9e670d6ccb0d54d3b9c4985","fromRef":{"kind":"ImageStreamTag","name":"node:5.11.0-slim"}}}]},"status":{"phase":"New","outputDockerImageReference":"docker-registry.default.svc:5000/voting-application/result:latest","config":{"kind":"BuildConfig","namespace":"voting-application","name":"result"},"output":{}}}
-      - name: SOURCE_REPOSITORY
-        value: https://github.com/storbel/example-voting-app.git
-      - name: SOURCE_URI
-        value: https://github.com/storbel/example-voting-app.git
-      - name: SOURCE_CONTEXT_DIR
-        value: result
-      image: docker.io/openshift/origin-docker-builder:v3.11.0
-      imagePullPolicy: IfNotPresent
-      name: git-clone
-      resources: {}
-      terminationMessagePath: /dev/termination-log
-      terminationMessagePolicy: FallbackToLogsOnError
-      volumeMounts:
-      - mountPath: /tmp/build
-        name: buildworkdir
-      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
-        name: builder-token-gzhht
-        readOnly: true
-    - args:
-      - --loglevel=0
-      command:
-      - openshift-manage-dockerfile
-      env:
-      - name: BUILD
-        value: |
-          {"kind":"Build","apiVersion":"build.openshift.io/v1","metadata":{"name":"result-1","namespace":"voting-application","selfLink":"/apis/build.openshift.io/v1/namespaces/voting-application/builds/result-1","uid":"e260ccb4-44c5-11ea-bfc6-0242ac110037","resourceVersion":"51278","creationTimestamp":"2020-02-01T07:38:48Z","labels":{"app":"result","buildconfig":"result","openshift.io/build-config.name":"result","openshift.io/build.start-policy":"Serial"},"annotations":{"openshift.io/build-config.name":"result","openshift.io/build.number":"1"},"ownerReferences":[{"apiVersion":"build.openshift.io/v1","kind":"BuildConfig","name":"result","uid":"e1f88198-44c5-11ea-bfc6-0242ac110037","controller":true}]},"spec":{"serviceAccount":"builder","source":{"type":"Git","git":{"uri":"https://github.com/storbel/example-voting-app.git"},"contextDir":"result"},"strategy":{"type":"Docker","dockerStrategy":{"from":{"kind":"DockerImage","name":"node@sha256:fb4e332730514c393a78a3f0be6b6e1a7f7f3a63c9e670d6ccb0d54d3b9c4985"},"pullSecret":{"name":"builder-dockercfg-9sn6j"}}},"output":{"to":{"kind":"DockerImage","name":"docker-registry.default.svc:5000/voting-application/result:latest"},"pushSecret":{"name":"builder-dockercfg-9sn6j"}},"resources":{},"postCommit":{},"nodeSelector":null,"triggeredBy":[{"message":"Image change","imageChangeBuild":{"imageID":"node@sha256:fb4e332730514c393a78a3f0be6b6e1a7f7f3a63c9e670d6ccb0d54d3b9c4985","fromRef":{"kind":"ImageStreamTag","name":"node:5.11.0-slim"}}}]},"status":{"phase":"New","outputDockerImageReference":"docker-registry.default.svc:5000/voting-application/result:latest","config":{"kind":"BuildConfig","namespace":"voting-application","name":"result"},"output":{}}}
-      - name: SOURCE_REPOSITORY
-        value: https://github.com/storbel/example-voting-app.git
-      - name: SOURCE_URI
-        value: https://github.com/storbel/example-voting-app.git
-      - name: SOURCE_CONTEXT_DIR
-        value: result
-      image: docker.io/openshift/origin-docker-builder:v3.11.0
-      imagePullPolicy: IfNotPresent
-      name: manage-dockerfile
-      resources: {}
-      terminationMessagePath: /dev/termination-log
-      terminationMessagePolicy: FallbackToLogsOnError
-      volumeMounts:
-      - mountPath: /tmp/build
-        name: buildworkdir
-      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
-        name: builder-token-gzhht
-        readOnly: true
-    nodeName: master
-    nodeSelector:
-      node-role.kubernetes.io/compute: "true"
-    priority: 0
-    restartPolicy: Never
-    schedulerName: default-scheduler
-    securityContext: {}
-    serviceAccount: builder
-    serviceAccountName: builder
-    terminationGracePeriodSeconds: 30
-    volumes:
-    - emptyDir: {}
-      name: buildworkdir
-    - hostPath:
-        path: /var/run/docker.sock
-        type: ""
-      name: docker-socket
-    - hostPath:
-        path: /var/run/crio/crio.sock
-        type: ""
-      name: crio-socket
-    - name: builder-dockercfg-9sn6j-push
-      secret:
-        defaultMode: 384
-        secretName: builder-dockercfg-9sn6j
-    - name: builder-dockercfg-9sn6j-pull
-      secret:
-        defaultMode: 384
-        secretName: builder-dockercfg-9sn6j
-    - name: builder-token-gzhht
-      secret:
-        defaultMode: 420
-        secretName: builder-token-gzhht
-  status: {}
-- apiVersion: v1
-  kind: Pod
-  metadata:
-    annotations:
-      openshift.io/build.name: vote-1
-      openshift.io/scc: privileged
-    creationTimestamp: null
-    labels:
-      openshift.io/build.name: vote-1
-    name: vote-1-build
-    ownerReferences:
-    - apiVersion: build.openshift.io/v1
-      controller: true
-      kind: Build
-      name: vote-1
-      uid: c6ceddd9-44c5-11ea-bfc6-0242ac110037
-  spec:
-    containers:
-    - args:
-      - --loglevel=0
-      command:
-      - openshift-docker-build
-      env:
-      - name: BUILD
-        value: |
-          {"kind":"Build","apiVersion":"build.openshift.io/v1","metadata":{"name":"vote-1","namespace":"voting-application","selfLink":"/apis/build.openshift.io/v1/namespaces/voting-application/builds/vote-1","uid":"c6ceddd9-44c5-11ea-bfc6-0242ac110037","resourceVersion":"51066","creationTimestamp":"2020-02-01T07:38:02Z","labels":{"app":"vote","buildconfig":"vote","openshift.io/build-config.name":"vote","openshift.io/build.start-policy":"Serial"},"annotations":{"openshift.io/build-config.name":"vote","openshift.io/build.number":"1"},"ownerReferences":[{"apiVersion":"build.openshift.io/v1","kind":"BuildConfig","name":"vote","uid":"c659512a-44c5-11ea-bfc6-0242ac110037","controller":true}]},"spec":{"serviceAccount":"builder","source":{"type":"Git","git":{"uri":"https://github.com/storbel/example-voting-app.git"},"contextDir":"vote"},"strategy":{"type":"Docker","dockerStrategy":{"from":{"kind":"DockerImage","name":"python@sha256:4752132e31eadf0964b296421ce03b066673313af805995b583d03790cefbd43"},"pullSecret":{"name":"builder-dockercfg-9sn6j"}}},"output":{"to":{"kind":"DockerImage","name":"docker-registry.default.svc:5000/voting-application/vote:latest"},"pushSecret":{"name":"builder-dockercfg-9sn6j"}},"resources":{},"postCommit":{},"nodeSelector":null,"triggeredBy":[{"message":"Image change","imageChangeBuild":{"imageID":"python@sha256:4752132e31eadf0964b296421ce03b066673313af805995b583d03790cefbd43","fromRef":{"kind":"ImageStreamTag","name":"python:2.7-alpine"}}}]},"status":{"phase":"New","outputDockerImageReference":"docker-registry.default.svc:5000/voting-application/vote:latest","config":{"kind":"BuildConfig","namespace":"voting-application","name":"vote"},"output":{}}}
-      - name: SOURCE_REPOSITORY
-        value: https://github.com/storbel/example-voting-app.git
-      - name: SOURCE_URI
-        value: https://github.com/storbel/example-voting-app.git
-      - name: SOURCE_CONTEXT_DIR
-        value: vote
-      - name: PUSH_DOCKERCFG_PATH
-        value: /var/run/secrets/openshift.io/push
-      - name: PULL_DOCKERCFG_PATH
-        value: /var/run/secrets/openshift.io/pull
-      image: docker.io/openshift/origin-docker-builder:v3.11.0
-      imagePullPolicy: IfNotPresent
-      name: docker-build
-      resources: {}
-      securityContext:
-        privileged: true
-      terminationMessagePath: /dev/termination-log
-      terminationMessagePolicy: FallbackToLogsOnError
-      volumeMounts:
-      - mountPath: /tmp/build
-        name: buildworkdir
-      - mountPath: /var/run/docker.sock
-        name: docker-socket
-      - mountPath: /var/run/crio/crio.sock
-        name: crio-socket
-      - mountPath: /var/run/secrets/openshift.io/push
-        name: builder-dockercfg-9sn6j-push
-        readOnly: true
-      - mountPath: /var/run/secrets/openshift.io/pull
-        name: builder-dockercfg-9sn6j-pull
-        readOnly: true
-      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
-        name: builder-token-gzhht
-        readOnly: true
-    dnsPolicy: ClusterFirst
-    imagePullSecrets:
-    - name: builder-dockercfg-9sn6j
-    initContainers:
-    - args:
-      - --loglevel=0
-      command:
-      - openshift-git-clone
-      env:
-      - name: BUILD
-        value: |
-          {"kind":"Build","apiVersion":"build.openshift.io/v1","metadata":{"name":"vote-1","namespace":"voting-application","selfLink":"/apis/build.openshift.io/v1/namespaces/voting-application/builds/vote-1","uid":"c6ceddd9-44c5-11ea-bfc6-0242ac110037","resourceVersion":"51066","creationTimestamp":"2020-02-01T07:38:02Z","labels":{"app":"vote","buildconfig":"vote","openshift.io/build-config.name":"vote","openshift.io/build.start-policy":"Serial"},"annotations":{"openshift.io/build-config.name":"vote","openshift.io/build.number":"1"},"ownerReferences":[{"apiVersion":"build.openshift.io/v1","kind":"BuildConfig","name":"vote","uid":"c659512a-44c5-11ea-bfc6-0242ac110037","controller":true}]},"spec":{"serviceAccount":"builder","source":{"type":"Git","git":{"uri":"https://github.com/storbel/example-voting-app.git"},"contextDir":"vote"},"strategy":{"type":"Docker","dockerStrategy":{"from":{"kind":"DockerImage","name":"python@sha256:4752132e31eadf0964b296421ce03b066673313af805995b583d03790cefbd43"},"pullSecret":{"name":"builder-dockercfg-9sn6j"}}},"output":{"to":{"kind":"DockerImage","name":"docker-registry.default.svc:5000/voting-application/vote:latest"},"pushSecret":{"name":"builder-dockercfg-9sn6j"}},"resources":{},"postCommit":{},"nodeSelector":null,"triggeredBy":[{"message":"Image change","imageChangeBuild":{"imageID":"python@sha256:4752132e31eadf0964b296421ce03b066673313af805995b583d03790cefbd43","fromRef":{"kind":"ImageStreamTag","name":"python:2.7-alpine"}}}]},"status":{"phase":"New","outputDockerImageReference":"docker-registry.default.svc:5000/voting-application/vote:latest","config":{"kind":"BuildConfig","namespace":"voting-application","name":"vote"},"output":{}}}
-      - name: SOURCE_REPOSITORY
-        value: https://github.com/storbel/example-voting-app.git
-      - name: SOURCE_URI
-        value: https://github.com/storbel/example-voting-app.git
-      - name: SOURCE_CONTEXT_DIR
-        value: vote
-      image: docker.io/openshift/origin-docker-builder:v3.11.0
-      imagePullPolicy: IfNotPresent
-      name: git-clone
-      resources: {}
-      terminationMessagePath: /dev/termination-log
-      terminationMessagePolicy: FallbackToLogsOnError
-      volumeMounts:
-      - mountPath: /tmp/build
-        name: buildworkdir
-      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
-        name: builder-token-gzhht
-        readOnly: true
-    - args:
-      - --loglevel=0
-      command:
-      - openshift-manage-dockerfile
-      env:
-      - name: BUILD
-        value: |
-          {"kind":"Build","apiVersion":"build.openshift.io/v1","metadata":{"name":"vote-1","namespace":"voting-application","selfLink":"/apis/build.openshift.io/v1/namespaces/voting-application/builds/vote-1","uid":"c6ceddd9-44c5-11ea-bfc6-0242ac110037","resourceVersion":"51066","creationTimestamp":"2020-02-01T07:38:02Z","labels":{"app":"vote","buildconfig":"vote","openshift.io/build-config.name":"vote","openshift.io/build.start-policy":"Serial"},"annotations":{"openshift.io/build-config.name":"vote","openshift.io/build.number":"1"},"ownerReferences":[{"apiVersion":"build.openshift.io/v1","kind":"BuildConfig","name":"vote","uid":"c659512a-44c5-11ea-bfc6-0242ac110037","controller":true}]},"spec":{"serviceAccount":"builder","source":{"type":"Git","git":{"uri":"https://github.com/storbel/example-voting-app.git"},"contextDir":"vote"},"strategy":{"type":"Docker","dockerStrategy":{"from":{"kind":"DockerImage","name":"python@sha256:4752132e31eadf0964b296421ce03b066673313af805995b583d03790cefbd43"},"pullSecret":{"name":"builder-dockercfg-9sn6j"}}},"output":{"to":{"kind":"DockerImage","name":"docker-registry.default.svc:5000/voting-application/vote:latest"},"pushSecret":{"name":"builder-dockercfg-9sn6j"}},"resources":{},"postCommit":{},"nodeSelector":null,"triggeredBy":[{"message":"Image change","imageChangeBuild":{"imageID":"python@sha256:4752132e31eadf0964b296421ce03b066673313af805995b583d03790cefbd43","fromRef":{"kind":"ImageStreamTag","name":"python:2.7-alpine"}}}]},"status":{"phase":"New","outputDockerImageReference":"docker-registry.default.svc:5000/voting-application/vote:latest","config":{"kind":"BuildConfig","namespace":"voting-application","name":"vote"},"output":{}}}
-      - name: SOURCE_REPOSITORY
-        value: https://github.com/storbel/example-voting-app.git
-      - name: SOURCE_URI
-        value: https://github.com/storbel/example-voting-app.git
-      - name: SOURCE_CONTEXT_DIR
-        value: vote
-      image: docker.io/openshift/origin-docker-builder:v3.11.0
-      imagePullPolicy: IfNotPresent
-      name: manage-dockerfile
-      resources: {}
-      terminationMessagePath: /dev/termination-log
-      terminationMessagePolicy: FallbackToLogsOnError
-      volumeMounts:
-      - mountPath: /tmp/build
-        name: buildworkdir
-      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
-        name: builder-token-gzhht
-        readOnly: true
-    nodeName: master
-    nodeSelector:
-      node-role.kubernetes.io/compute: "true"
-    priority: 0
-    restartPolicy: Never
-    schedulerName: default-scheduler
-    securityContext: {}
-    serviceAccount: builder
-    serviceAccountName: builder
-    terminationGracePeriodSeconds: 30
-    volumes:
-    - emptyDir: {}
-      name: buildworkdir
-    - hostPath:
-        path: /var/run/docker.sock
-        type: ""
-      name: docker-socket
-    - hostPath:
-        path: /var/run/crio/crio.sock
-        type: ""
-      name: crio-socket
-    - name: builder-dockercfg-9sn6j-push
-      secret:
-        defaultMode: 384
-        secretName: builder-dockercfg-9sn6j
-    - name: builder-dockercfg-9sn6j-pull
-      secret:
-        defaultMode: 384
-        secretName: builder-dockercfg-9sn6j
-    - name: builder-token-gzhht
-      secret:
-        defaultMode: 420
-        secretName: builder-token-gzhht
-  status: {}
-- apiVersion: v1
-  kind: Pod
-  metadata:
-    annotations:
-      openshift.io/deployment-config.latest-version: "1"
-      openshift.io/deployment-config.name: vote
-      openshift.io/deployment.name: vote-1
-      openshift.io/generated-by: OpenShiftNewApp
-      openshift.io/scc: anyuid
-    creationTimestamp: null
-    generateName: vote-1-
-    labels:
-      app: vote
-      deployment: vote-1
-      deploymentconfig: vote
-    ownerReferences:
-    - apiVersion: v1
-      blockOwnerDeletion: true
-      controller: true
-      kind: ReplicationController
-      name: vote-1
-      uid: e472f949-44c5-11ea-bfc6-0242ac110037
-  spec:
-    containers:
-    - env:
-      - name: REDIS_PASSWORD
-        value: redis_password
-      image: docker-registry.default.svc:5000/voting-application/vote@sha256:d82bd21f053d5a459083e9ad7a768848848cfa85bb1b1db68dc999e4270b0070
-      imagePullPolicy: Always
-      name: vote
-      ports:
-      - containerPort: 80
-        protocol: TCP
-      resources: {}
-      securityContext:
-        capabilities:
-          drop:
-          - MKNOD
-      terminationMessagePath: /dev/termination-log
-      terminationMessagePolicy: File
-      volumeMounts:
-      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
-        name: default-token-vlkqm
-        readOnly: true
-    dnsPolicy: ClusterFirst
-    imagePullSecrets:
-    - name: default-dockercfg-vz5sz
-    nodeName: master
-    nodeSelector:
-      node-role.kubernetes.io/compute: "true"
-    priority: 0
-    restartPolicy: Always
-    schedulerName: default-scheduler
-    securityContext:
-      seLinuxOptions:
-        level: s0:c17,c4
-    serviceAccount: default
-    serviceAccountName: default
-    terminationGracePeriodSeconds: 30
-    volumes:
-    - name: default-token-vlkqm
-      secret:
-        defaultMode: 420
-        secretName: default-token-vlkqm
-  status: {}
-- apiVersion: v1
-  kind: Pod
-  metadata:
-    annotations:
-      openshift.io/deployment-config.latest-version: "1"
-      openshift.io/deployment-config.name: worker
-      openshift.io/deployment.name: worker-1
-      openshift.io/generated-by: OpenShiftNewApp
-      openshift.io/scc: anyuid
-    creationTimestamp: null
-    generateName: worker-1-
-    labels:
-      app: worker
-      deployment: worker-1
-      deploymentconfig: worker
-    ownerReferences:
-    - apiVersion: v1
-      blockOwnerDeletion: true
-      controller: true
-      kind: ReplicationController
-      name: worker-1
-      uid: 1c7abbdc-44c6-11ea-bfc6-0242ac110037
-  spec:
-    containers:
-    - image: docker-registry.default.svc:5000/voting-application/worker@sha256:a18c33fac46c60766b07eef81d6b184082dc52ede1e088f6c639b546274925f4
-      imagePullPolicy: Always
-      name: worker
-      resources: {}
-      securityContext:
-        capabilities:
-          drop:
-          - MKNOD
-      terminationMessagePath: /dev/termination-log
-      terminationMessagePolicy: File
-      volumeMounts:
-      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
-        name: default-token-vlkqm
-        readOnly: true
-    dnsPolicy: ClusterFirst
-    imagePullSecrets:
-    - name: default-dockercfg-vz5sz
-    nodeName: master
-    nodeSelector:
-      node-role.kubernetes.io/compute: "true"
-    priority: 0
-    restartPolicy: Always
-    schedulerName: default-scheduler
-    securityContext:
-      seLinuxOptions:
-        level: s0:c17,c4
-    serviceAccount: default
-    serviceAccountName: default
-    terminationGracePeriodSeconds: 30
-    volumes:
-    - name: default-token-vlkqm
-      secret:
-        defaultMode: 420
-        secretName: default-token-vlkqm
-  status: {}
-- apiVersion: v1
-  kind: Pod
-  metadata:
-    annotations:
-      openshift.io/build.name: worker-1
-      openshift.io/scc: privileged
-    creationTimestamp: null
-    labels:
-      openshift.io/build.name: worker-1
-    name: worker-1-build
-    ownerReferences:
-    - apiVersion: build.openshift.io/v1
-      controller: true
-      kind: Build
-      name: worker-1
-      uid: e8d8e214-44c5-11ea-bfc6-0242ac110037
-  spec:
-    containers:
-    - args:
-      - --loglevel=0
-      command:
-      - openshift-docker-build
-      env:
-      - name: BUILD
-        value: |
-          {"kind":"Build","apiVersion":"build.openshift.io/v1","metadata":{"name":"worker-1","namespace":"voting-application","selfLink":"/apis/build.openshift.io/v1/namespaces/voting-application/builds/worker-1","uid":"e8d8e214-44c5-11ea-bfc6-0242ac110037","resourceVersion":"51382","creationTimestamp":"2020-02-01T07:38:59Z","labels":{"app":"worker","buildconfig":"worker","openshift.io/build-config.name":"worker","openshift.io/build.start-policy":"Serial"},"annotations":{"openshift.io/build-config.name":"worker","openshift.io/build.number":"1"},"ownerReferences":[{"apiVersion":"build.openshift.io/v1","kind":"BuildConfig","name":"worker","uid":"e8697aaa-44c5-11ea-bfc6-0242ac110037","controller":true}]},"spec":{"serviceAccount":"builder","source":{"type":"Git","git":{"uri":"https://github.com/storbel/example-voting-app.git"},"contextDir":"worker"},"strategy":{"type":"Docker","dockerStrategy":{"from":{"kind":"DockerImage","name":"java@sha256:d49bf8c44670834d3dade17f8b84d709e7db47f1887f671a0e098bafa9bae49f"},"pullSecret":{"name":"builder-dockercfg-9sn6j"}}},"output":{"to":{"kind":"DockerImage","name":"docker-registry.default.svc:5000/voting-application/worker:latest"},"pushSecret":{"name":"builder-dockercfg-9sn6j"}},"resources":{},"postCommit":{},"nodeSelector":null,"triggeredBy":[{"message":"Image change","imageChangeBuild":{"imageID":"java@sha256:d49bf8c44670834d3dade17f8b84d709e7db47f1887f671a0e098bafa9bae49f","fromRef":{"kind":"ImageStreamTag","name":"java:openjdk-8-jdk-alpine"}}}]},"status":{"phase":"New","outputDockerImageReference":"docker-registry.default.svc:5000/voting-application/worker:latest","config":{"kind":"BuildConfig","namespace":"voting-application","name":"worker"},"output":{}}}
-      - name: SOURCE_REPOSITORY
-        value: https://github.com/storbel/example-voting-app.git
-      - name: SOURCE_URI
-        value: https://github.com/storbel/example-voting-app.git
-      - name: SOURCE_CONTEXT_DIR
-        value: worker
-      - name: PUSH_DOCKERCFG_PATH
-        value: /var/run/secrets/openshift.io/push
-      - name: PULL_DOCKERCFG_PATH
-        value: /var/run/secrets/openshift.io/pull
-      image: docker.io/openshift/origin-docker-builder:v3.11.0
-      imagePullPolicy: IfNotPresent
-      name: docker-build
-      resources: {}
-      securityContext:
-        privileged: true
-      terminationMessagePath: /dev/termination-log
-      terminationMessagePolicy: FallbackToLogsOnError
-      volumeMounts:
-      - mountPath: /tmp/build
-        name: buildworkdir
-      - mountPath: /var/run/docker.sock
-        name: docker-socket
-      - mountPath: /var/run/crio/crio.sock
-        name: crio-socket
-      - mountPath: /var/run/secrets/openshift.io/push
-        name: builder-dockercfg-9sn6j-push
-        readOnly: true
-      - mountPath: /var/run/secrets/openshift.io/pull
-        name: builder-dockercfg-9sn6j-pull
-        readOnly: true
-      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
-        name: builder-token-gzhht
-        readOnly: true
-    dnsPolicy: ClusterFirst
-    imagePullSecrets:
-    - name: builder-dockercfg-9sn6j
-    initContainers:
-    - args:
-      - --loglevel=0
-      command:
-      - openshift-git-clone
-      env:
-      - name: BUILD
-        value: |
-          {"kind":"Build","apiVersion":"build.openshift.io/v1","metadata":{"name":"worker-1","namespace":"voting-application","selfLink":"/apis/build.openshift.io/v1/namespaces/voting-application/builds/worker-1","uid":"e8d8e214-44c5-11ea-bfc6-0242ac110037","resourceVersion":"51382","creationTimestamp":"2020-02-01T07:38:59Z","labels":{"app":"worker","buildconfig":"worker","openshift.io/build-config.name":"worker","openshift.io/build.start-policy":"Serial"},"annotations":{"openshift.io/build-config.name":"worker","openshift.io/build.number":"1"},"ownerReferences":[{"apiVersion":"build.openshift.io/v1","kind":"BuildConfig","name":"worker","uid":"e8697aaa-44c5-11ea-bfc6-0242ac110037","controller":true}]},"spec":{"serviceAccount":"builder","source":{"type":"Git","git":{"uri":"https://github.com/storbel/example-voting-app.git"},"contextDir":"worker"},"strategy":{"type":"Docker","dockerStrategy":{"from":{"kind":"DockerImage","name":"java@sha256:d49bf8c44670834d3dade17f8b84d709e7db47f1887f671a0e098bafa9bae49f"},"pullSecret":{"name":"builder-dockercfg-9sn6j"}}},"output":{"to":{"kind":"DockerImage","name":"docker-registry.default.svc:5000/voting-application/worker:latest"},"pushSecret":{"name":"builder-dockercfg-9sn6j"}},"resources":{},"postCommit":{},"nodeSelector":null,"triggeredBy":[{"message":"Image change","imageChangeBuild":{"imageID":"java@sha256:d49bf8c44670834d3dade17f8b84d709e7db47f1887f671a0e098bafa9bae49f","fromRef":{"kind":"ImageStreamTag","name":"java:openjdk-8-jdk-alpine"}}}]},"status":{"phase":"New","outputDockerImageReference":"docker-registry.default.svc:5000/voting-application/worker:latest","config":{"kind":"BuildConfig","namespace":"voting-application","name":"worker"},"output":{}}}
-      - name: SOURCE_REPOSITORY
-        value: https://github.com/storbel/example-voting-app.git
-      - name: SOURCE_URI
-        value: https://github.com/storbel/example-voting-app.git
-      - name: SOURCE_CONTEXT_DIR
-        value: worker
-      image: docker.io/openshift/origin-docker-builder:v3.11.0
-      imagePullPolicy: IfNotPresent
-      name: git-clone
-      resources: {}
-      terminationMessagePath: /dev/termination-log
-      terminationMessagePolicy: FallbackToLogsOnError
-      volumeMounts:
-      - mountPath: /tmp/build
-        name: buildworkdir
-      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
-        name: builder-token-gzhht
-        readOnly: true
-    - args:
-      - --loglevel=0
-      command:
-      - openshift-manage-dockerfile
-      env:
-      - name: BUILD
-        value: |
-          {"kind":"Build","apiVersion":"build.openshift.io/v1","metadata":{"name":"worker-1","namespace":"voting-application","selfLink":"/apis/build.openshift.io/v1/namespaces/voting-application/builds/worker-1","uid":"e8d8e214-44c5-11ea-bfc6-0242ac110037","resourceVersion":"51382","creationTimestamp":"2020-02-01T07:38:59Z","labels":{"app":"worker","buildconfig":"worker","openshift.io/build-config.name":"worker","openshift.io/build.start-policy":"Serial"},"annotations":{"openshift.io/build-config.name":"worker","openshift.io/build.number":"1"},"ownerReferences":[{"apiVersion":"build.openshift.io/v1","kind":"BuildConfig","name":"worker","uid":"e8697aaa-44c5-11ea-bfc6-0242ac110037","controller":true}]},"spec":{"serviceAccount":"builder","source":{"type":"Git","git":{"uri":"https://github.com/storbel/example-voting-app.git"},"contextDir":"worker"},"strategy":{"type":"Docker","dockerStrategy":{"from":{"kind":"DockerImage","name":"java@sha256:d49bf8c44670834d3dade17f8b84d709e7db47f1887f671a0e098bafa9bae49f"},"pullSecret":{"name":"builder-dockercfg-9sn6j"}}},"output":{"to":{"kind":"DockerImage","name":"docker-registry.default.svc:5000/voting-application/worker:latest"},"pushSecret":{"name":"builder-dockercfg-9sn6j"}},"resources":{},"postCommit":{},"nodeSelector":null,"triggeredBy":[{"message":"Image change","imageChangeBuild":{"imageID":"java@sha256:d49bf8c44670834d3dade17f8b84d709e7db47f1887f671a0e098bafa9bae49f","fromRef":{"kind":"ImageStreamTag","name":"java:openjdk-8-jdk-alpine"}}}]},"status":{"phase":"New","outputDockerImageReference":"docker-registry.default.svc:5000/voting-application/worker:latest","config":{"kind":"BuildConfig","namespace":"voting-application","name":"worker"},"output":{}}}
-      - name: SOURCE_REPOSITORY
-        value: https://github.com/storbel/example-voting-app.git
-      - name: SOURCE_URI
-        value: https://github.com/storbel/example-voting-app.git
-      - name: SOURCE_CONTEXT_DIR
-        value: worker
-      image: docker.io/openshift/origin-docker-builder:v3.11.0
-      imagePullPolicy: IfNotPresent
-      name: manage-dockerfile
-      resources: {}
-      terminationMessagePath: /dev/termination-log
-      terminationMessagePolicy: FallbackToLogsOnError
-      volumeMounts:
-      - mountPath: /tmp/build
-        name: buildworkdir
-      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
-        name: builder-token-gzhht
-        readOnly: true
-    nodeName: master
-    nodeSelector:
-      node-role.kubernetes.io/compute: "true"
-    priority: 0
-    restartPolicy: Never
-    schedulerName: default-scheduler
-    securityContext: {}
-    serviceAccount: builder
-    serviceAccountName: builder
-    terminationGracePeriodSeconds: 30
-    volumes:
-    - emptyDir: {}
-      name: buildworkdir
-    - hostPath:
-        path: /var/run/docker.sock
-        type: ""
-      name: docker-socket
-    - hostPath:
-        path: /var/run/crio/crio.sock
-        type: ""
-      name: crio-socket
-    - name: builder-dockercfg-9sn6j-push
-      secret:
-        defaultMode: 384
-        secretName: builder-dockercfg-9sn6j
-    - name: builder-dockercfg-9sn6j-pull
-      secret:
-        defaultMode: 384
-        secretName: builder-dockercfg-9sn6j
-    - name: builder-token-gzhht
-      secret:
-        defaultMode: 420
-        secretName: builder-token-gzhht
-  status: {}
-- apiVersion: v1
-  kind: ReplicationController
-  metadata:
-    annotations:
-      openshift.io/deployer-pod.completed-at: 2020-02-01 07:39:06 +0000 UTC
-      openshift.io/deployer-pod.created-at: 2020-02-01 07:38:33 +0000 UTC
-      openshift.io/deployer-pod.name: postgresql-1-deploy
-      openshift.io/deployment-config.latest-version: "1"
-      openshift.io/deployment-config.name: postgresql
-      openshift.io/deployment.phase: Complete
-      openshift.io/deployment.replicas: "1"
-      openshift.io/deployment.status-reason: config change
-      openshift.io/encoded-deployment-config: |
-        {"kind":"DeploymentConfig","apiVersion":"apps.openshift.io/v1","metadata":{"name":"postgresql","namespace":"voting-application","selfLink":"/apis/apps.openshift.io/v1/namespaces/voting-application/deploymentconfigs/postgresql","uid":"d98ca9c2-44c5-11ea-bfc6-0242ac110037","resourceVersion":"51196","generation":2,"creationTimestamp":"2020-02-01T07:38:33Z","labels":{"app":"db","template":"postgresql-ephemeral-template"},"annotations":{"openshift.io/generated-by":"OpenShiftNewApp","template.alpha.openshift.io/wait-for-ready":"true"}},"spec":{"strategy":{"type":"Recreate","recreateParams":{"timeoutSeconds":600},"resources":{},"activeDeadlineSeconds":21600},"triggers":[{"type":"ImageChange","imageChangeParams":{"automatic":true,"containerNames":["postgresql"],"from":{"kind":"ImageStreamTag","namespace":"openshift","name":"postgresql:9.6"},"lastTriggeredImage":"docker-registry.default.svc:5000/openshift/postgresql@sha256:00adb16dd5f890e6b575ad073b5c272d0ff6ab5f862b09317bf4aed56dcee8d1"}},{"type":"ConfigChange"}],"replicas":1,"revisionHistoryLimit":10,"test":false,"selector":{"name":"postgresql"},"template":{"metadata":{"creationTimestamp":null,"labels":{"app":"db","name":"postgresql"},"annotations":{"openshift.io/generated-by":"OpenShiftNewApp"}},"spec":{"volumes":[{"name":"postgresql-data","emptyDir":{}}],"containers":[{"name":"postgresql","image":"docker-registry.default.svc:5000/openshift/postgresql@sha256:00adb16dd5f890e6b575ad073b5c272d0ff6ab5f862b09317bf4aed56dcee8d1","ports":[{"containerPort":5432,"protocol":"TCP"}],"env":[{"name":"DATABASE_SERVICE_NAME","value":"db"},{"name":"POSTGRESQL_DATABASE","value":"postgres"},{"name":"POSTGRESQL_PASSWORD","value":"postgres_password"},{"name":"POSTGRESQL_USER","value":"postgres_user"}],"resources":{"limits":{"memory":"512Mi"}},"volumeMounts":[{"name":"postgresql-data","mountPath":"/var/lib/pgsql/data"}],"livenessProbe":{"exec":{"command":["/usr/libexec/check-container","--live"]},"initialDelaySeconds":120,"timeoutSeconds":10,"periodSeconds":10,"successThreshold":1,"failureThreshold":3},"readinessProbe":{"exec":{"command":["/usr/libexec/check-container"]},"initialDelaySeconds":5,"timeoutSeconds":1,"periodSeconds":10,"successThreshold":1,"failureThreshold":3},"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy":"File","imagePullPolicy":"IfNotPresent","securityContext":{"capabilities":{},"privileged":false}}],"restartPolicy":"Always","terminationGracePeriodSeconds":30,"dnsPolicy":"ClusterFirst","securityContext":{},"schedulerName":"default-scheduler"}}},"status":{"latestVersion":1,"observedGeneration":0,"replicas":0,"updatedReplicas":0,"availableReplicas":0,"unavailableReplicas":0,"details":{"message":"config change","causes":[{"type":"ConfigChange"}]}}}
-    creationTimestamp: null
-    generation: 2
-    labels:
-      app: db
-      openshift.io/deployment-config.name: postgresql
-      template: postgresql-ephemeral-template
-    name: postgresql-1
-    ownerReferences:
-    - apiVersion: apps.openshift.io/v1
-      blockOwnerDeletion: true
-      controller: true
-      kind: DeploymentConfig
-      name: postgresql
-      uid: d98ca9c2-44c5-11ea-bfc6-0242ac110037
-  spec:
-    replicas: 1
-    selector:
-      deployment: postgresql-1
-      deploymentconfig: postgresql
-      name: postgresql
-    template:
-      metadata:
-        annotations:
-          openshift.io/deployment-config.latest-version: "1"
-          openshift.io/deployment-config.name: postgresql
-          openshift.io/deployment.name: postgresql-1
-          openshift.io/generated-by: OpenShiftNewApp
-        creationTimestamp: null
-        labels:
-          app: db
-          deployment: postgresql-1
-          deploymentconfig: postgresql
-          name: postgresql
-      spec:
-        containers:
-        - env:
-          - name: DATABASE_SERVICE_NAME
-            value: db
-          - name: POSTGRESQL_DATABASE
-            value: postgres
-          - name: POSTGRESQL_PASSWORD
-            value: postgres_password
-          - name: POSTGRESQL_USER
-            value: postgres_user
-          image: docker-registry.default.svc:5000/openshift/postgresql@sha256:00adb16dd5f890e6b575ad073b5c272d0ff6ab5f862b09317bf4aed56dcee8d1
-          imagePullPolicy: IfNotPresent
-          livenessProbe:
-            exec:
-              command:
-              - /usr/libexec/check-container
-              - --live
-            failureThreshold: 3
-            initialDelaySeconds: 120
-            periodSeconds: 10
-            successThreshold: 1
-            timeoutSeconds: 10
-          name: postgresql
-          ports:
-          - containerPort: 5432
-            protocol: TCP
-          readinessProbe:
-            exec:
-              command:
-              - /usr/libexec/check-container
-            failureThreshold: 3
-            initialDelaySeconds: 5
-            periodSeconds: 10
-            successThreshold: 1
-            timeoutSeconds: 1
-          resources:
-            limits:
-              memory: 512Mi
-          securityContext:
-            capabilities: {}
-            privileged: false
-          terminationMessagePath: /dev/termination-log
-          terminationMessagePolicy: File
-          volumeMounts:
-          - mountPath: /var/lib/pgsql/data
-            name: postgresql-data
-        dnsPolicy: ClusterFirst
-        restartPolicy: Always
-        schedulerName: default-scheduler
-        securityContext: {}
-        terminationGracePeriodSeconds: 30
-        volumes:
-        - emptyDir: {}
-          name: postgresql-data
-  status:
-    replicas: 0
-- apiVersion: v1
-  kind: ReplicationController
-  metadata:
-    annotations:
-      openshift.io/deployer-pod.completed-at: 2020-02-01 07:38:38 +0000 UTC
-      openshift.io/deployer-pod.created-at: 2020-02-01 07:38:11 +0000 UTC
-      openshift.io/deployer-pod.name: redis-1-deploy
-      openshift.io/deployment-config.latest-version: "1"
-      openshift.io/deployment-config.name: redis
-      openshift.io/deployment.phase: Complete
-      openshift.io/deployment.replicas: "1"
-      openshift.io/deployment.status-reason: config change
-      openshift.io/encoded-deployment-config: |
-        {"kind":"DeploymentConfig","apiVersion":"apps.openshift.io/v1","metadata":{"name":"redis","namespace":"voting-application","selfLink":"/apis/apps.openshift.io/v1/namespaces/voting-application/deploymentconfigs/redis","uid":"cb5c10f4-44c5-11ea-bfc6-0242ac110037","resourceVersion":"51098","generation":2,"creationTimestamp":"2020-02-01T07:38:09Z","labels":{"app":"redis","template":"redis-ephemeral-template"},"annotations":{"openshift.io/generated-by":"OpenShiftNewApp","template.alpha.openshift.io/wait-for-ready":"true"}},"spec":{"strategy":{"type":"Recreate","recreateParams":{"timeoutSeconds":600},"resources":{},"activeDeadlineSeconds":21600},"triggers":[{"type":"ImageChange","imageChangeParams":{"automatic":true,"containerNames":["redis"],"from":{"kind":"ImageStreamTag","namespace":"openshift","name":"redis:3.2"},"lastTriggeredImage":"docker-registry.default.svc:5000/openshift/redis@sha256:06dbb609484330ec6be6090109f1fa16e936afcf975d1cbc5fff3e6c7cae7542"}},{"type":"ConfigChange"}],"replicas":1,"revisionHistoryLimit":10,"test":false,"selector":{"name":"redis"},"template":{"metadata":{"creationTimestamp":null,"labels":{"app":"redis","name":"redis"},"annotations":{"openshift.io/generated-by":"OpenShiftNewApp"}},"spec":{"volumes":[{"name":"redis-data","emptyDir":{}}],"containers":[{"name":"redis","image":"docker-registry.default.svc:5000/openshift/redis@sha256:06dbb609484330ec6be6090109f1fa16e936afcf975d1cbc5fff3e6c7cae7542","ports":[{"containerPort":6379,"protocol":"TCP"}],"env":[{"name":"REDIS_PASSWORD","value":"redis_password"}],"resources":{"limits":{"memory":"512Mi"}},"volumeMounts":[{"name":"redis-data","mountPath":"/var/lib/redis/data"}],"livenessProbe":{"tcpSocket":{"port":6379},"initialDelaySeconds":30,"timeoutSeconds":1,"periodSeconds":10,"successThreshold":1,"failureThreshold":3},"readinessProbe":{"exec":{"command":["/bin/sh","-i","-c","test \"$(redis-cli -h 127.0.0.1 -a $REDIS_PASSWORD ping)\" == \"PONG\""]},"initialDelaySeconds":5,"timeoutSeconds":1,"periodSeconds":10,"successThreshold":1,"failureThreshold":3},"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy":"File","imagePullPolicy":"IfNotPresent","securityContext":{"capabilities":{},"privileged":false}}],"restartPolicy":"Always","terminationGracePeriodSeconds":30,"dnsPolicy":"ClusterFirst","securityContext":{},"schedulerName":"default-scheduler"}}},"status":{"latestVersion":1,"observedGeneration":1,"replicas":0,"updatedReplicas":0,"availableReplicas":0,"unavailableReplicas":0,"details":{"message":"config change","causes":[{"type":"ConfigChange"}]},"conditions":[{"type":"Available","status":"False","lastUpdateTime":"2020-02-01T07:38:09Z","lastTransitionTime":"2020-02-01T07:38:09Z","message":"Deployment config does not have minimum availability."}]}}
-    creationTimestamp: null
-    generation: 2
-    labels:
-      app: redis
-      openshift.io/deployment-config.name: redis
-      template: redis-ephemeral-template
-    name: redis-1
-    ownerReferences:
-    - apiVersion: apps.openshift.io/v1
-      blockOwnerDeletion: true
-      controller: true
-      kind: DeploymentConfig
-      name: redis
-      uid: cb5c10f4-44c5-11ea-bfc6-0242ac110037
-  spec:
-    replicas: 1
-    selector:
-      deployment: redis-1
-      deploymentconfig: redis
-      name: redis
-    template:
-      metadata:
-        annotations:
-          openshift.io/deployment-config.latest-version: "1"
-          openshift.io/deployment-config.name: redis
-          openshift.io/deployment.name: redis-1
-          openshift.io/generated-by: OpenShiftNewApp
-        creationTimestamp: null
-        labels:
-          app: redis
-          deployment: redis-1
-          deploymentconfig: redis
-          name: redis
-      spec:
-        containers:
-        - env:
-          - name: REDIS_PASSWORD
-            value: redis_password
-          image: docker-registry.default.svc:5000/openshift/redis@sha256:06dbb609484330ec6be6090109f1fa16e936afcf975d1cbc5fff3e6c7cae7542
-          imagePullPolicy: IfNotPresent
-          livenessProbe:
-            failureThreshold: 3
-            initialDelaySeconds: 30
-            periodSeconds: 10
-            successThreshold: 1
-            tcpSocket:
-              port: 6379
-            timeoutSeconds: 1
-          name: redis
-          ports:
-          - containerPort: 6379
-            protocol: TCP
-          readinessProbe:
-            exec:
-              command:
-              - /bin/sh
-              - -i
-              - -c
-              - test "$(redis-cli -h 127.0.0.1 -a $REDIS_PASSWORD ping)" == "PONG"
-            failureThreshold: 3
-            initialDelaySeconds: 5
-            periodSeconds: 10
-            successThreshold: 1
-            timeoutSeconds: 1
-          resources:
-            limits:
-              memory: 512Mi
-          securityContext:
-            capabilities: {}
-            privileged: false
-          terminationMessagePath: /dev/termination-log
-          terminationMessagePolicy: File
-          volumeMounts:
-          - mountPath: /var/lib/redis/data
-            name: redis-data
-        dnsPolicy: ClusterFirst
-        restartPolicy: Always
-        schedulerName: default-scheduler
-        securityContext: {}
-        terminationGracePeriodSeconds: 30
-        volumes:
-        - emptyDir: {}
-          name: redis-data
-  status:
-    replicas: 0
-- apiVersion: v1
-  kind: ReplicationController
-  metadata:
-    annotations:
-      openshift.io/deployer-pod.completed-at: 2020-02-01 07:40:37 +0000 UTC
-      openshift.io/deployer-pod.created-at: 2020-02-01 07:40:30 +0000 UTC
-      openshift.io/deployer-pod.name: result-1-deploy
-      openshift.io/deployment-config.latest-version: "1"
-      openshift.io/deployment-config.name: result
-      openshift.io/deployment.phase: Complete
-      openshift.io/deployment.replicas: "1"
-      openshift.io/deployment.status-reason: config change
-      openshift.io/encoded-deployment-config: |
-        {"kind":"DeploymentConfig","apiVersion":"apps.openshift.io/v1","metadata":{"name":"result","namespace":"voting-application","selfLink":"/apis/apps.openshift.io/v1/namespaces/voting-application/deploymentconfigs/result","uid":"e2077cc4-44c5-11ea-bfc6-0242ac110037","resourceVersion":"51655","generation":2,"creationTimestamp":"2020-02-01T07:38:47Z","labels":{"app":"result"},"annotations":{"openshift.io/generated-by":"OpenShiftNewApp"}},"spec":{"strategy":{"type":"Rolling","rollingParams":{"updatePeriodSeconds":1,"intervalSeconds":1,"timeoutSeconds":600,"maxUnavailable":"25%","maxSurge":"25%"},"resources":{},"activeDeadlineSeconds":21600},"triggers":[{"type":"ConfigChange"},{"type":"ImageChange","imageChangeParams":{"automatic":true,"containerNames":["result"],"from":{"kind":"ImageStreamTag","namespace":"voting-application","name":"result:latest"},"lastTriggeredImage":"docker-registry.default.svc:5000/voting-application/result@sha256:03d58eee0a86b7beb54f67e95b0619983d842466109450d759cea595968bfa9a"}}],"replicas":1,"revisionHistoryLimit":10,"test":false,"selector":{"app":"result","deploymentconfig":"result"},"template":{"metadata":{"creationTimestamp":null,"labels":{"app":"result","deploymentconfig":"result"},"annotations":{"openshift.io/generated-by":"OpenShiftNewApp"}},"spec":{"containers":[{"name":"result","image":"docker-registry.default.svc:5000/voting-application/result@sha256:03d58eee0a86b7beb54f67e95b0619983d842466109450d759cea595968bfa9a","ports":[{"containerPort":80,"protocol":"TCP"}],"env":[{"name":"PORT","value":"8080"}],"resources":{},"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy":"File","imagePullPolicy":"Always"}],"restartPolicy":"Always","terminationGracePeriodSeconds":30,"dnsPolicy":"ClusterFirst","securityContext":{},"schedulerName":"default-scheduler"}}},"status":{"latestVersion":1,"observedGeneration":1,"replicas":0,"updatedReplicas":0,"availableReplicas":0,"unavailableReplicas":0,"details":{"message":"config change","causes":[{"type":"ConfigChange"}]},"conditions":[{"type":"Available","status":"False","lastUpdateTime":"2020-02-01T07:38:47Z","lastTransitionTime":"2020-02-01T07:38:47Z","message":"Deployment config does not have minimum availability."}]}}
-    creationTimestamp: null
-    generation: 2
-    labels:
-      app: result
-      openshift.io/deployment-config.name: result
-    name: result-1
-    ownerReferences:
-    - apiVersion: apps.openshift.io/v1
-      blockOwnerDeletion: true
-      controller: true
-      kind: DeploymentConfig
-      name: result
-      uid: e2077cc4-44c5-11ea-bfc6-0242ac110037
-  spec:
-    replicas: 1
-    selector:
-      app: result
-      deployment: result-1
-      deploymentconfig: result
-    template:
-      metadata:
-        annotations:
-          openshift.io/deployment-config.latest-version: "1"
-          openshift.io/deployment-config.name: result
-          openshift.io/deployment.name: result-1
-          openshift.io/generated-by: OpenShiftNewApp
-        creationTimestamp: null
-        labels:
-          app: result
-          deployment: result-1
-          deploymentconfig: result
-      spec:
-        containers:
-        - env:
-          - name: PORT
-            value: "8080"
-          image: docker-registry.default.svc:5000/voting-application/result@sha256:03d58eee0a86b7beb54f67e95b0619983d842466109450d759cea595968bfa9a
-          imagePullPolicy: Always
-          name: result
-          ports:
-          - containerPort: 80
-            protocol: TCP
-          resources: {}
-          terminationMessagePath: /dev/termination-log
-          terminationMessagePolicy: File
-        dnsPolicy: ClusterFirst
-        restartPolicy: Always
-        schedulerName: default-scheduler
-        securityContext: {}
-        terminationGracePeriodSeconds: 30
-  status:
-    replicas: 0
-- apiVersion: v1
-  kind: ReplicationController
-  metadata:
-    annotations:
-      openshift.io/deployer-pod.completed-at: 2020-02-01 07:39:02 +0000 UTC
-      openshift.io/deployer-pod.created-at: 2020-02-01 07:38:52 +0000 UTC
-      openshift.io/deployer-pod.name: vote-1-deploy
-      openshift.io/deployment-config.latest-version: "1"
-      openshift.io/deployment-config.name: vote
-      openshift.io/deployment.phase: Complete
-      openshift.io/deployment.replicas: "1"
-      openshift.io/deployment.status-reason: config change
-      openshift.io/encoded-deployment-config: |
-        {"kind":"DeploymentConfig","apiVersion":"apps.openshift.io/v1","metadata":{"name":"vote","namespace":"voting-application","selfLink":"/apis/apps.openshift.io/v1/namespaces/voting-application/deploymentconfigs/vote","uid":"c664cbd5-44c5-11ea-bfc6-0242ac110037","resourceVersion":"51295","generation":2,"creationTimestamp":"2020-02-01T07:38:01Z","labels":{"app":"vote"},"annotations":{"openshift.io/generated-by":"OpenShiftNewApp"}},"spec":{"strategy":{"type":"Rolling","rollingParams":{"updatePeriodSeconds":1,"intervalSeconds":1,"timeoutSeconds":600,"maxUnavailable":"25%","maxSurge":"25%"},"resources":{},"activeDeadlineSeconds":21600},"triggers":[{"type":"ConfigChange"},{"type":"ImageChange","imageChangeParams":{"automatic":true,"containerNames":["vote"],"from":{"kind":"ImageStreamTag","namespace":"voting-application","name":"vote:latest"},"lastTriggeredImage":"docker-registry.default.svc:5000/voting-application/vote@sha256:d82bd21f053d5a459083e9ad7a768848848cfa85bb1b1db68dc999e4270b0070"}}],"replicas":1,"revisionHistoryLimit":10,"test":false,"selector":{"app":"vote","deploymentconfig":"vote"},"template":{"metadata":{"creationTimestamp":null,"labels":{"app":"vote","deploymentconfig":"vote"},"annotations":{"openshift.io/generated-by":"OpenShiftNewApp"}},"spec":{"containers":[{"name":"vote","image":"docker-registry.default.svc:5000/voting-application/vote@sha256:d82bd21f053d5a459083e9ad7a768848848cfa85bb1b1db68dc999e4270b0070","ports":[{"containerPort":80,"protocol":"TCP"}],"env":[{"name":"REDIS_PASSWORD","value":"redis_password"}],"resources":{},"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy":"File","imagePullPolicy":"Always"}],"restartPolicy":"Always","terminationGracePeriodSeconds":30,"dnsPolicy":"ClusterFirst","securityContext":{},"schedulerName":"default-scheduler"}}},"status":{"latestVersion":1,"observedGeneration":1,"replicas":0,"updatedReplicas":0,"availableReplicas":0,"unavailableReplicas":0,"details":{"message":"config change","causes":[{"type":"ConfigChange"}]},"conditions":[{"type":"Available","status":"False","lastUpdateTime":"2020-02-01T07:38:01Z","lastTransitionTime":"2020-02-01T07:38:01Z","message":"Deployment config does not have minimum availability."}]}}
-    creationTimestamp: null
-    generation: 2
-    labels:
-      app: vote
-      openshift.io/deployment-config.name: vote
-    name: vote-1
-    ownerReferences:
-    - apiVersion: apps.openshift.io/v1
-      blockOwnerDeletion: true
-      controller: true
-      kind: DeploymentConfig
-      name: vote
-      uid: c664cbd5-44c5-11ea-bfc6-0242ac110037
-  spec:
-    replicas: 1
-    selector:
-      app: vote
-      deployment: vote-1
-      deploymentconfig: vote
-    template:
-      metadata:
-        annotations:
-          openshift.io/deployment-config.latest-version: "1"
-          openshift.io/deployment-config.name: vote
-          openshift.io/deployment.name: vote-1
-          openshift.io/generated-by: OpenShiftNewApp
-        creationTimestamp: null
-        labels:
-          app: vote
-          deployment: vote-1
-          deploymentconfig: vote
-      spec:
-        containers:
-        - env:
-          - name: REDIS_PASSWORD
-            value: redis_password
-          image: docker-registry.default.svc:5000/voting-application/vote@sha256:d82bd21f053d5a459083e9ad7a768848848cfa85bb1b1db68dc999e4270b0070
-          imagePullPolicy: Always
-          name: vote
-          ports:
-          - containerPort: 80
-            protocol: TCP
-          resources: {}
-          terminationMessagePath: /dev/termination-log
-          terminationMessagePolicy: File
-        dnsPolicy: ClusterFirst
-        restartPolicy: Always
-        schedulerName: default-scheduler
-        securityContext: {}
-        terminationGracePeriodSeconds: 30
-  status:
-    replicas: 0
-- apiVersion: v1
-  kind: ReplicationController
-  metadata:
-    annotations:
-      openshift.io/deployer-pod.completed-at: 2020-02-01 07:40:32 +0000 UTC
-      openshift.io/deployer-pod.created-at: 2020-02-01 07:40:26 +0000 UTC
-      openshift.io/deployer-pod.name: worker-1-deploy
-      openshift.io/deployment-config.latest-version: "1"
-      openshift.io/deployment-config.name: worker
-      openshift.io/deployment.phase: Complete
-      openshift.io/deployment.replicas: "1"
-      openshift.io/deployment.status-reason: config change
-      openshift.io/encoded-deployment-config: |
-        {"kind":"DeploymentConfig","apiVersion":"apps.openshift.io/v1","metadata":{"name":"worker","namespace":"voting-application","selfLink":"/apis/apps.openshift.io/v1/namespaces/voting-application/deploymentconfigs/worker","uid":"e8734ff7-44c5-11ea-bfc6-0242ac110037","resourceVersion":"51610","generation":2,"creationTimestamp":"2020-02-01T07:38:58Z","labels":{"app":"worker"},"annotations":{"openshift.io/generated-by":"OpenShiftNewApp"}},"spec":{"strategy":{"type":"Rolling","rollingParams":{"updatePeriodSeconds":1,"intervalSeconds":1,"timeoutSeconds":600,"maxUnavailable":"25%","maxSurge":"25%"},"resources":{},"activeDeadlineSeconds":21600},"triggers":[{"type":"ConfigChange"},{"type":"ImageChange","imageChangeParams":{"automatic":true,"containerNames":["worker"],"from":{"kind":"ImageStreamTag","namespace":"voting-application","name":"worker:latest"},"lastTriggeredImage":"docker-registry.default.svc:5000/voting-application/worker@sha256:a18c33fac46c60766b07eef81d6b184082dc52ede1e088f6c639b546274925f4"}}],"replicas":1,"revisionHistoryLimit":10,"test":false,"selector":{"app":"worker","deploymentconfig":"worker"},"template":{"metadata":{"creationTimestamp":null,"labels":{"app":"worker","deploymentconfig":"worker"},"annotations":{"openshift.io/generated-by":"OpenShiftNewApp"}},"spec":{"containers":[{"name":"worker","image":"docker-registry.default.svc:5000/voting-application/worker@sha256:a18c33fac46c60766b07eef81d6b184082dc52ede1e088f6c639b546274925f4","resources":{},"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy":"File","imagePullPolicy":"Always"}],"restartPolicy":"Always","terminationGracePeriodSeconds":30,"dnsPolicy":"ClusterFirst","securityContext":{},"schedulerName":"default-scheduler"}}},"status":{"latestVersion":1,"observedGeneration":1,"replicas":0,"updatedReplicas":0,"availableReplicas":0,"unavailableReplicas":0,"details":{"message":"config change","causes":[{"type":"ConfigChange"}]},"conditions":[{"type":"Available","status":"False","lastUpdateTime":"2020-02-01T07:38:58Z","lastTransitionTime":"2020-02-01T07:38:58Z","message":"Deployment config does not have minimum availability."}]}}
-    creationTimestamp: null
-    generation: 2
-    labels:
-      app: worker
-      openshift.io/deployment-config.name: worker
-    name: worker-1
-    ownerReferences:
-    - apiVersion: apps.openshift.io/v1
-      blockOwnerDeletion: true
-      controller: true
-      kind: DeploymentConfig
-      name: worker
-      uid: e8734ff7-44c5-11ea-bfc6-0242ac110037
-  spec:
-    replicas: 1
-    selector:
-      app: worker
-      deployment: worker-1
-      deploymentconfig: worker
-    template:
-      metadata:
-        annotations:
-          openshift.io/deployment-config.latest-version: "1"
-          openshift.io/deployment-config.name: worker
-          openshift.io/deployment.name: worker-1
-          openshift.io/generated-by: OpenShiftNewApp
-        creationTimestamp: null
-        labels:
-          app: worker
-          deployment: worker-1
-          deploymentconfig: worker
-      spec:
-        containers:
-        - image: docker-registry.default.svc:5000/voting-application/worker@sha256:a18c33fac46c60766b07eef81d6b184082dc52ede1e088f6c639b546274925f4
-          imagePullPolicy: Always
-          name: worker
-          resources: {}
-          terminationMessagePath: /dev/termination-log
-          terminationMessagePolicy: File
-        dnsPolicy: ClusterFirst
-        restartPolicy: Always
-        schedulerName: default-scheduler
-        securityContext: {}
-        terminationGracePeriodSeconds: 30
-  status:
-    replicas: 0
-- apiVersion: v1
   kind: Service
   metadata:
     annotations:
@@ -1371,7 +134,7 @@ items:
             value: postgres_password
           - name: POSTGRESQL_USER
             value: postgres_user
-          image: docker-registry.default.svc:5000/openshift/postgresql@sha256:00adb16dd5f890e6b575ad073b5c272d0ff6ab5f862b09317bf4aed56dcee8d1
+          image: docker-registry.default.svc:5000/openshift/postgresql
           imagePullPolicy: IfNotPresent
           livenessProbe:
             exec:
@@ -1425,24 +188,12 @@ items:
           kind: ImageStreamTag
           name: postgresql:9.6
           namespace: openshift
-        lastTriggeredImage: docker-registry.default.svc:5000/openshift/postgresql@sha256:00adb16dd5f890e6b575ad073b5c272d0ff6ab5f862b09317bf4aed56dcee8d1
       type: ImageChange
     - type: ConfigChange
-  status:
-    availableReplicas: 0
-    latestVersion: 0
-    observedGeneration: 0
-    replicas: 0
-    unavailableReplicas: 0
-    updatedReplicas: 0
+
 - apiVersion: apps.openshift.io/v1
   kind: DeploymentConfig
   metadata:
-    annotations:
-      openshift.io/generated-by: OpenShiftNewApp
-      template.alpha.openshift.io/wait-for-ready: "true"
-    creationTimestamp: null
-    generation: 2
     labels:
       app: redis
       template: redis-ephemeral-template
@@ -1471,7 +222,7 @@ items:
         - env:
           - name: REDIS_PASSWORD
             value: redis_password
-          image: docker-registry.default.svc:5000/openshift/redis@sha256:06dbb609484330ec6be6090109f1fa16e936afcf975d1cbc5fff3e6c7cae7542
+          image: docker-registry.default.svc:5000/openshift/redis
           imagePullPolicy: IfNotPresent
           livenessProbe:
             failureThreshold: 3
@@ -1526,22 +277,12 @@ items:
           kind: ImageStreamTag
           name: redis:3.2
           namespace: openshift
-        lastTriggeredImage: docker-registry.default.svc:5000/openshift/redis@sha256:06dbb609484330ec6be6090109f1fa16e936afcf975d1cbc5fff3e6c7cae7542
       type: ImageChange
     - type: ConfigChange
-  status:
-    availableReplicas: 0
-    latestVersion: 0
-    observedGeneration: 0
-    replicas: 0
-    unavailableReplicas: 0
-    updatedReplicas: 0
+
 - apiVersion: apps.openshift.io/v1
   kind: DeploymentConfig
   metadata:
-    annotations:
-      openshift.io/generated-by: OpenShiftNewApp
-    creationTimestamp: null
     generation: 2
     labels:
       app: result
@@ -1575,7 +316,7 @@ items:
         - env:
           - name: PORT
             value: "8080"
-          image: docker-registry.default.svc:5000/voting-application/result@sha256:03d58eee0a86b7beb54f67e95b0619983d842466109450d759cea595968bfa9a
+          image: docker-registry.default.svc:5000/voting-application/result
           imagePullPolicy: Always
           name: result
           ports:
@@ -1600,21 +341,11 @@ items:
           kind: ImageStreamTag
           name: result:latest
           namespace: voting-application
-        lastTriggeredImage: docker-registry.default.svc:5000/voting-application/result@sha256:03d58eee0a86b7beb54f67e95b0619983d842466109450d759cea595968bfa9a
       type: ImageChange
-  status:
-    availableReplicas: 0
-    latestVersion: 0
-    observedGeneration: 0
-    replicas: 0
-    unavailableReplicas: 0
-    updatedReplicas: 0
+
 - apiVersion: apps.openshift.io/v1
   kind: DeploymentConfig
   metadata:
-    annotations:
-      openshift.io/generated-by: OpenShiftNewApp
-    creationTimestamp: null
     generation: 2
     labels:
       app: vote
@@ -1648,7 +379,7 @@ items:
         - env:
           - name: REDIS_PASSWORD
             value: redis_password
-          image: docker-registry.default.svc:5000/voting-application/vote@sha256:d82bd21f053d5a459083e9ad7a768848848cfa85bb1b1db68dc999e4270b0070
+          image: docker-registry.default.svc:5000/voting-application/vote
           imagePullPolicy: Always
           name: vote
           ports:
@@ -1673,22 +404,12 @@ items:
           kind: ImageStreamTag
           name: vote:latest
           namespace: voting-application
-        lastTriggeredImage: docker-registry.default.svc:5000/voting-application/vote@sha256:d82bd21f053d5a459083e9ad7a768848848cfa85bb1b1db68dc999e4270b0070
+
       type: ImageChange
-  status:
-    availableReplicas: 0
-    latestVersion: 0
-    observedGeneration: 0
-    replicas: 0
-    unavailableReplicas: 0
-    updatedReplicas: 0
+
 - apiVersion: apps.openshift.io/v1
   kind: DeploymentConfig
   metadata:
-    annotations:
-      openshift.io/generated-by: OpenShiftNewApp
-    creationTimestamp: null
-    generation: 2
     labels:
       app: worker
     name: worker
@@ -1718,7 +439,7 @@ items:
           deploymentconfig: worker
       spec:
         containers:
-        - image: docker-registry.default.svc:5000/voting-application/worker@sha256:a18c33fac46c60766b07eef81d6b184082dc52ede1e088f6c639b546274925f4
+        - image: docker-registry.default.svc:5000/voting-application/worker
           imagePullPolicy: Always
           name: worker
           resources: {}
@@ -1740,21 +461,11 @@ items:
           kind: ImageStreamTag
           name: worker:latest
           namespace: voting-application
-        lastTriggeredImage: docker-registry.default.svc:5000/voting-application/worker@sha256:a18c33fac46c60766b07eef81d6b184082dc52ede1e088f6c639b546274925f4
       type: ImageChange
-  status:
-    availableReplicas: 0
-    latestVersion: 0
-    observedGeneration: 0
-    replicas: 0
-    unavailableReplicas: 0
-    updatedReplicas: 0
+
 - apiVersion: build.openshift.io/v1
   kind: BuildConfig
   metadata:
-    annotations:
-      openshift.io/generated-by: OpenShiftNewApp
-    creationTimestamp: null
     labels:
       app: result
     name: result
@@ -1779,25 +490,9 @@ items:
           kind: ImageStreamTag
           name: node:5.11.0-slim
       type: Docker
-    successfulBuildsHistoryLimit: 5
-    triggers:
-    - github:
-        secret: -JD_f8sIffHCfSENlxAe
-      type: GitHub
-    - generic:
-        secret: K-zTNPSEGIsQOmSVjDdZ
-      type: Generic
-    - type: ConfigChange
-    - imageChange: {}
-      type: ImageChange
-  status:
-    lastVersion: 0
 - apiVersion: build.openshift.io/v1
   kind: BuildConfig
   metadata:
-    annotations:
-      openshift.io/generated-by: OpenShiftNewApp
-    creationTimestamp: null
     labels:
       app: vote
     name: vote
@@ -1817,30 +512,12 @@ items:
         uri: https://github.com/storbel/example-voting-app.git
       type: Git
     strategy:
-      dockerStrategy:
-        from:
-          kind: ImageStreamTag
-          name: python:2.7-alpine
       type: Docker
-    successfulBuildsHistoryLimit: 5
-    triggers:
-    - github:
-        secret: sFD6TYKgS8TiE0laCi44
-      type: GitHub
-    - generic:
-        secret: khiHfzrwcBXyGMfS63fh
-      type: Generic
-    - type: ConfigChange
-    - imageChange: {}
-      type: ImageChange
-  status:
-    lastVersion: 0
+
 - apiVersion: build.openshift.io/v1
   kind: BuildConfig
   metadata:
-    annotations:
-      openshift.io/generated-by: OpenShiftNewApp
-    creationTimestamp: null
+
     labels:
       app: worker
     name: worker
@@ -1860,141 +537,37 @@ items:
         uri: https://github.com/storbel/example-voting-app.git
       type: Git
     strategy:
-      dockerStrategy:
-        from:
-          kind: ImageStreamTag
-          name: java:openjdk-8-jdk-alpine
       type: Docker
-    successfulBuildsHistoryLimit: 5
-    triggers:
-    - github:
-        secret: odENqmG4PSH2yIcJ-rxB
-      type: GitHub
-    - generic:
-        secret: 8RJbRNhUu_zRH5ayHC7J
-      type: Generic
-    - type: ConfigChange
-    - imageChange: {}
-      type: ImageChange
-  status:
-    lastVersion: 0
+
 - apiVersion: build.openshift.io/v1
   kind: Build
   metadata:
-    annotations:
-      openshift.io/build-config.name: result
-      openshift.io/build.number: "1"
-      openshift.io/build.pod-name: result-1-build
-    creationTimestamp: null
     labels:
       app: result
       buildconfig: result
-      openshift.io/build-config.name: result
-      openshift.io/build.start-policy: Serial
-    name: result-1
-    ownerReferences:
-    - apiVersion: build.openshift.io/v1
-      controller: true
-      kind: BuildConfig
-      name: result
-      uid: e1f88198-44c5-11ea-bfc6-0242ac110037
+    name: result
   spec:
     nodeSelector: null
     output:
-      pushSecret:
-        name: builder-dockercfg-9sn6j
-      to:
         kind: ImageStreamTag
         name: result:latest
-    postCommit: {}
-    resources: {}
-    revision:
-      git:
-        author:
-          email: mmumshad@gmail.com
-          name: Mumshad Mannambeth
-        commit: 8815e7ea93c7a156b035883f290424019957134c
-        committer:
-          email: mmumshad@gmail.com
-          name: Mumshad Mannambeth
-        message: Update azure-pipelines.yml for Azure Pipelines
-      type: Git
-    serviceAccount: builder
     source:
       contextDir: result
       git:
         uri: https://github.com/storbel/example-voting-app.git
       type: Git
     strategy:
-      dockerStrategy:
-        from:
-          kind: DockerImage
-          name: node@sha256:fb4e332730514c393a78a3f0be6b6e1a7f7f3a63c9e670d6ccb0d54d3b9c4985
       type: Docker
-    triggeredBy:
-    - imageChangeBuild:
-        fromRef:
-          kind: ImageStreamTag
-          name: node:5.11.0-slim
-        imageID: node@sha256:fb4e332730514c393a78a3f0be6b6e1a7f7f3a63c9e670d6ccb0d54d3b9c4985
-      message: Image change
-  status:
-    config:
-      name: result
-    output:
-      to:
-        imageDigest: sha256:03d58eee0a86b7beb54f67e95b0619983d842466109450d759cea595968bfa9a
-    outputDockerImageReference: docker-registry.default.svc:5000/voting-application/result:latest
-    phase: New
-    stages:
-    - durationMilliseconds: 1439
-      name: FetchInputs
-      startTime: "2020-02-01T07:38:53Z"
-      steps:
-      - durationMilliseconds: 1439
-        name: FetchGitSource
-        startTime: "2020-02-01T07:38:53Z"
-    - durationMilliseconds: 15489
-      name: PullImages
-      startTime: "2020-02-01T07:38:59Z"
-      steps:
-      - durationMilliseconds: 15489
-        name: PullBaseImage
-        startTime: "2020-02-01T07:38:59Z"
-    - durationMilliseconds: 59484
-      name: Build
-      startTime: "2020-02-01T07:39:14Z"
-      steps:
-      - durationMilliseconds: 59484
-        name: DockerBuild
-        startTime: "2020-02-01T07:39:14Z"
-    - durationMilliseconds: 16870
-      name: PushImage
-      startTime: "2020-02-01T07:40:14Z"
-      steps:
-      - durationMilliseconds: 16870
-        name: PushDockerImage
-        startTime: "2020-02-01T07:40:14Z"
+
 - apiVersion: build.openshift.io/v1
   kind: Build
   metadata:
-    annotations:
-      openshift.io/build-config.name: vote
-      openshift.io/build.number: "1"
-      openshift.io/build.pod-name: vote-1-build
-    creationTimestamp: null
     labels:
       app: vote
       buildconfig: vote
       openshift.io/build-config.name: vote
       openshift.io/build.start-policy: Serial
-    name: vote-1
-    ownerReferences:
-    - apiVersion: build.openshift.io/v1
-      controller: true
-      kind: BuildConfig
-      name: vote
-      uid: c659512a-44c5-11ea-bfc6-0242ac110037
+    name: vote
   spec:
     nodeSelector: null
     output:
@@ -2003,180 +576,42 @@ items:
       to:
         kind: ImageStreamTag
         name: vote:latest
-    postCommit: {}
-    resources: {}
-    revision:
-      git:
-        author:
-          email: mmumshad@gmail.com
-          name: Mumshad Mannambeth
-        commit: 8815e7ea93c7a156b035883f290424019957134c
-        committer:
-          email: mmumshad@gmail.com
-          name: Mumshad Mannambeth
-        message: Update azure-pipelines.yml for Azure Pipelines
-      type: Git
-    serviceAccount: builder
+
     source:
       contextDir: vote
       git:
         uri: https://github.com/storbel/example-voting-app.git
       type: Git
     strategy:
-      dockerStrategy:
-        from:
-          kind: DockerImage
-          name: python@sha256:4752132e31eadf0964b296421ce03b066673313af805995b583d03790cefbd43
       type: Docker
-    triggeredBy:
-    - imageChangeBuild:
-        fromRef:
-          kind: ImageStreamTag
-          name: python:2.7-alpine
-        imageID: python@sha256:4752132e31eadf0964b296421ce03b066673313af805995b583d03790cefbd43
-      message: Image change
-  status:
-    config:
-      name: vote
-    output:
-      to:
-        imageDigest: sha256:d82bd21f053d5a459083e9ad7a768848848cfa85bb1b1db68dc999e4270b0070
-    outputDockerImageReference: docker-registry.default.svc:5000/voting-application/vote:latest
-    phase: New
-    stages:
-    - durationMilliseconds: 1484
-      name: FetchInputs
-      startTime: "2020-02-01T07:38:12Z"
-      steps:
-      - durationMilliseconds: 1484
-        name: FetchGitSource
-        startTime: "2020-02-01T07:38:12Z"
-    - durationMilliseconds: 8073
-      name: PullImages
-      startTime: "2020-02-01T07:38:17Z"
-      steps:
-      - durationMilliseconds: 8073
-        name: PullBaseImage
-        startTime: "2020-02-01T07:38:17Z"
-    - durationMilliseconds: 16100
-      name: Build
-      startTime: "2020-02-01T07:38:25Z"
-      steps:
-      - durationMilliseconds: 16100
-        name: DockerBuild
-        startTime: "2020-02-01T07:38:25Z"
-    - durationMilliseconds: 10412
-      name: PushImage
-      startTime: "2020-02-01T07:38:41Z"
-      steps:
-      - durationMilliseconds: 10412
-        name: PushDockerImage
-        startTime: "2020-02-01T07:38:41Z"
+
+
 - apiVersion: build.openshift.io/v1
   kind: Build
-  metadata:
-    annotations:
-      openshift.io/build-config.name: worker
-      openshift.io/build.number: "1"
-      openshift.io/build.pod-name: worker-1-build
-    creationTimestamp: null
+
     labels:
       app: worker
       buildconfig: worker
       openshift.io/build-config.name: worker
       openshift.io/build.start-policy: Serial
-    name: worker-1
-    ownerReferences:
-    - apiVersion: build.openshift.io/v1
-      controller: true
-      kind: BuildConfig
-      name: worker
-      uid: e8697aaa-44c5-11ea-bfc6-0242ac110037
+    name: worker
   spec:
     nodeSelector: null
     output:
-      pushSecret:
-        name: builder-dockercfg-9sn6j
-      to:
         kind: ImageStreamTag
         name: worker:latest
-    postCommit: {}
-    resources: {}
-    revision:
-      git:
-        author:
-          email: mmumshad@gmail.com
-          name: Mumshad Mannambeth
-        commit: 8815e7ea93c7a156b035883f290424019957134c
-        committer:
-          email: mmumshad@gmail.com
-          name: Mumshad Mannambeth
-        message: Update azure-pipelines.yml for Azure Pipelines
-      type: Git
-    serviceAccount: builder
     source:
       contextDir: worker
       git:
         uri: https://github.com/storbel/example-voting-app.git
       type: Git
     strategy:
-      dockerStrategy:
-        from:
-          kind: DockerImage
-          name: java@sha256:d49bf8c44670834d3dade17f8b84d709e7db47f1887f671a0e098bafa9bae49f
       type: Docker
-    triggeredBy:
-    - imageChangeBuild:
-        fromRef:
-          kind: ImageStreamTag
-          name: java:openjdk-8-jdk-alpine
-        imageID: java@sha256:d49bf8c44670834d3dade17f8b84d709e7db47f1887f671a0e098bafa9bae49f
-      message: Image change
-  status:
-    config:
-      name: worker
-    output:
-      to:
-        imageDigest: sha256:a18c33fac46c60766b07eef81d6b184082dc52ede1e088f6c639b546274925f4
-    outputDockerImageReference: docker-registry.default.svc:5000/voting-application/worker:latest
-    phase: New
-    stages:
-    - durationMilliseconds: 1429
-      name: FetchInputs
-      startTime: "2020-02-01T07:39:05Z"
-      steps:
-      - durationMilliseconds: 1429
-        name: FetchGitSource
-        startTime: "2020-02-01T07:39:05Z"
-    - durationMilliseconds: 8514
-      name: PullImages
-      startTime: "2020-02-01T07:39:10Z"
-      steps:
-      - durationMilliseconds: 8514
-        name: PullBaseImage
-        startTime: "2020-02-01T07:39:10Z"
-    - durationMilliseconds: 51783
-      name: Build
-      startTime: "2020-02-01T07:39:19Z"
-      steps:
-      - durationMilliseconds: 51783
-        name: DockerBuild
-        startTime: "2020-02-01T07:39:19Z"
-    - durationMilliseconds: 15051
-      name: PushImage
-      startTime: "2020-02-01T07:40:10Z"
-      steps:
-      - durationMilliseconds: 15051
-        name: PushDockerImage
-        startTime: "2020-02-01T07:40:10Z"
+
+
 - apiVersion: image.openshift.io/v1
   kind: ImageStream
   metadata:
-    annotations:
-      openshift.io/generated-by: OpenShiftNewApp
-      openshift.io/image.dockerRepositoryCheck: "2020-02-01T07:38:59Z"
-    creationTimestamp: null
-    generation: 2
     labels:
       app: worker
     name: java
@@ -2194,16 +629,10 @@ items:
       name: openjdk-8-jdk-alpine
       referencePolicy:
         type: Source
-  status:
-    dockerImageRepository: ""
+
 - apiVersion: image.openshift.io/v1
   kind: ImageStream
   metadata:
-    annotations:
-      openshift.io/generated-by: OpenShiftNewApp
-      openshift.io/image.dockerRepositoryCheck: "2020-02-01T07:38:48Z"
-    creationTimestamp: null
-    generation: 2
     labels:
       app: result
     name: node
@@ -2221,16 +650,10 @@ items:
       name: 5.11.0-slim
       referencePolicy:
         type: Source
-  status:
-    dockerImageRepository: ""
+
 - apiVersion: image.openshift.io/v1
   kind: ImageStream
   metadata:
-    annotations:
-      openshift.io/generated-by: OpenShiftNewApp
-      openshift.io/image.dockerRepositoryCheck: "2020-02-01T07:38:02Z"
-    creationTimestamp: null
-    generation: 2
     labels:
       app: vote
     name: python
@@ -2248,15 +671,10 @@ items:
       name: 2.7-alpine
       referencePolicy:
         type: Source
-  status:
-    dockerImageRepository: ""
+
 - apiVersion: image.openshift.io/v1
   kind: ImageStream
   metadata:
-    annotations:
-      openshift.io/generated-by: OpenShiftNewApp
-    creationTimestamp: null
-    generation: 1
     labels:
       app: result
     name: result
@@ -2273,15 +691,10 @@ items:
       name: latest
       referencePolicy:
         type: ""
-  status:
-    dockerImageRepository: ""
+
 - apiVersion: image.openshift.io/v1
   kind: ImageStream
   metadata:
-    annotations:
-      openshift.io/generated-by: OpenShiftNewApp
-    creationTimestamp: null
-    generation: 1
     labels:
       app: vote
     name: vote
@@ -2303,10 +716,6 @@ items:
 - apiVersion: image.openshift.io/v1
   kind: ImageStream
   metadata:
-    annotations:
-      openshift.io/generated-by: OpenShiftNewApp
-    creationTimestamp: null
-    generation: 1
     labels:
       app: worker
     name: worker
@@ -2323,8 +732,7 @@ items:
       name: latest
       referencePolicy:
         type: ""
-  status:
-    dockerImageRepository: ""
+
 - apiVersion: route.openshift.io/v1
   kind: Route
   metadata:
@@ -2343,15 +751,7 @@ items:
       name: result
       weight: 100
     wildcardPolicy: None
-  status:
-    ingress:
-    - conditions:
-      - lastTransitionTime: "2020-02-01T07:38:52Z"
-        status: "True"
-        type: Admitted
-      host: result-voting-application.2886795319-80-cykoria05.environments.katacoda.com
-      routerName: router
-      wildcardPolicy: None
+
 - apiVersion: route.openshift.io/v1
   kind: Route
   metadata:
@@ -2370,14 +770,5 @@ items:
       name: vote
       weight: 100
     wildcardPolicy: None
-  status:
-    ingress:
-    - conditions:
-      - lastTransitionTime: "2020-02-01T07:38:07Z"
-        status: "True"
-        type: Admitted
-      host: vote-voting-application.2886795319-80-cykoria05.environments.katacoda.com
-      routerName: router
-      wildcardPolicy: None
 kind: List
 metadata: {}
