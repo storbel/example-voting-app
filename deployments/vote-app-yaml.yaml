@@ -1,5 +1,271 @@
 apiVersion: v1
 items:
+
+- apiVersion: image.openshift.io/v1
+  kind: ImageStream
+  metadata:
+    labels:
+      app: worker
+    name: java
+  spec:
+    lookupPolicy:
+      local: false
+    tags:
+    - annotations:
+        openshift.io/imported-from: java:openjdk-8-jdk-alpine
+      from:
+        kind: DockerImage
+        name: docker-registry.default.svc:5000/voting-application/java:openjdk-8-jdk-alpine
+      generation: 2
+      importPolicy: {}
+      name: openjdk-8-jdk-alpine
+      referencePolicy:
+        type: Source
+
+- apiVersion: image.openshift.io/v1
+  kind: ImageStream
+  metadata:
+    labels:
+      app: result
+    name: node
+  spec:
+    lookupPolicy:
+      local: false
+    tags:
+    - annotations:
+        openshift.io/imported-from: node:5.11.0-slim
+      from:
+        kind: DockerImage
+        name: docker-registry.default.svc:5000/voting-application/node:5.11.0-slim
+      generation: 2
+      importPolicy: {}
+      name: 5.11.0-slim
+      referencePolicy:
+        type: Source
+
+- apiVersion: image.openshift.io/v1
+  kind: ImageStream
+  metadata:
+    labels:
+      app: vote
+    name: python
+  spec:
+    lookupPolicy:
+      local: false
+    tags:
+    - annotations:
+        openshift.io/imported-from: python:2.7-alpine
+      from:
+        kind: DockerImage
+        name: docker-registry.default.svc:5000/voting-application/python:2.7-alpine
+      generation: 2
+      importPolicy: {}
+      name: 2.7-alpine
+      referencePolicy:
+        type: Source
+
+- apiVersion: image.openshift.io/v1
+  kind: ImageStream
+  metadata:
+    labels:
+      app: result
+    name: result
+  spec:
+    lookupPolicy:
+      local: false
+    tags:
+    - annotations: null
+      from:
+        kind: DockerImage
+        name: docker-registry.default.svc:5000/voting-application/result:latest
+      generation: null
+      importPolicy: {}
+      name: latest
+      referencePolicy:
+        type: ""
+
+- apiVersion: image.openshift.io/v1
+  kind: ImageStream
+  metadata:
+    labels:
+      app: vote
+    name: vote
+  spec:
+    lookupPolicy:
+      local: false
+    tags:
+    - annotations: null
+      from:
+        kind: DockerImage
+        name: docker-registry.default.svc:5000/voting-application/vote:latest
+      generation: null
+      importPolicy: {}
+      name: latest
+      referencePolicy:
+        type: ""
+  status:
+    dockerImageRepository: ""
+- apiVersion: image.openshift.io/v1
+  kind: ImageStream
+  metadata:
+    labels:
+      app: worker
+    name: worker
+  spec:
+    lookupPolicy:
+      local: false
+    tags:
+    - annotations: null
+      from:
+        kind: DockerImage
+        name: docker-registry.default.svc:5000/voting-application/worker:latest
+      generation: null
+      importPolicy: {}
+      name: latest
+      referencePolicy:
+        type: ""
+- apiVersion: build.openshift.io/v1
+  kind: BuildConfig
+  metadata:
+    labels:
+      app: result
+    name: result
+  spec:
+    failedBuildsHistoryLimit: 5
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: result:latest
+    postCommit: {}
+    resources: {}
+    runPolicy: Serial
+    source:
+      contextDir: result
+      git:
+        uri: https://github.com/storbel/example-voting-app.git
+      type: Git
+    strategy:
+      type: Docker
+- apiVersion: build.openshift.io/v1
+  kind: BuildConfig
+  metadata:
+    labels:
+      app: vote
+    name: vote
+  spec:
+    failedBuildsHistoryLimit: 5
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: vote:latest
+    postCommit: {}
+    resources: {}
+    runPolicy: Serial
+    source:
+      contextDir: vote
+      git:
+        uri: https://github.com/storbel/example-voting-app.git
+      type: Git
+    strategy:
+      type: Docker
+
+- apiVersion: build.openshift.io/v1
+  kind: BuildConfig
+  metadata:
+
+    labels:
+      app: worker
+    name: worker
+  spec:
+    failedBuildsHistoryLimit: 5
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: worker:latest
+    postCommit: {}
+    resources: {}
+    runPolicy: Serial
+    source:
+      contextDir: worker
+      git:
+        uri: https://github.com/storbel/example-voting-app.git
+      type: Git
+    strategy:
+      type: Docker
+
+- apiVersion: build.openshift.io/v1
+  kind: Build
+  metadata:
+    labels:
+      app: result
+      buildconfig: result
+      openshift.io/build-config.name: result
+      openshift.io/build.start-policy: Serial
+    name: result
+  spec:
+    nodeSelector: null
+    output:
+        kind: ImageStreamTag
+        name: result:latest
+    source:
+      contextDir: result
+      git:
+        uri: https://github.com/storbel/example-voting-app.git
+      type: Git
+    strategy:
+      type: Docker
+
+- apiVersion: build.openshift.io/v1
+  kind: Build
+  metadata:
+    labels:
+      app: vote
+      buildconfig: vote
+      openshift.io/build-config.name: vote
+      openshift.io/build.start-policy: Serial
+    name: vote
+  spec:
+    nodeSelector: null
+    output:
+      pushSecret:
+        name: builder-dockercfg-9sn6j
+      to:
+        kind: ImageStreamTag
+        name: vote:latest
+
+    source:
+      contextDir: vote
+      git:
+        uri: https://github.com/storbel/example-voting-app.git
+      type: Git
+    strategy:
+      type: Docker
+
+
+- apiVersion: build.openshift.io/v1
+  kind: Build
+  metadata:
+    labels:
+      app: worker
+      buildconfig: worker
+      openshift.io/build-config.name: worker
+      openshift.io/build.start-policy: Serial
+    name: worker
+  spec:
+    nodeSelector: null
+    output:
+        kind: ImageStreamTag
+        name: worker:latest
+    source:
+      contextDir: worker
+      git:
+        uri: https://github.com/storbel/example-voting-app.git
+      type: Git
+    strategy:
+      type: Docker
 - apiVersion: v1
   kind: Service
   metadata:
@@ -463,275 +729,9 @@ items:
           namespace: voting-application
       type: ImageChange
 
-- apiVersion: build.openshift.io/v1
-  kind: BuildConfig
-  metadata:
-    labels:
-      app: result
-    name: result
-  spec:
-    failedBuildsHistoryLimit: 5
-    nodeSelector: null
-    output:
-      to:
-        kind: ImageStreamTag
-        name: result:latest
-    postCommit: {}
-    resources: {}
-    runPolicy: Serial
-    source:
-      contextDir: result
-      git:
-        uri: https://github.com/storbel/example-voting-app.git
-      type: Git
-    strategy:
-      dockerStrategy:
-        from:
-          kind: ImageStreamTag
-          name: node:5.11.0-slim
-      type: Docker
-- apiVersion: build.openshift.io/v1
-  kind: BuildConfig
-  metadata:
-    labels:
-      app: vote
-    name: vote
-  spec:
-    failedBuildsHistoryLimit: 5
-    nodeSelector: null
-    output:
-      to:
-        kind: ImageStreamTag
-        name: vote:latest
-    postCommit: {}
-    resources: {}
-    runPolicy: Serial
-    source:
-      contextDir: vote
-      git:
-        uri: https://github.com/storbel/example-voting-app.git
-      type: Git
-    strategy:
-      type: Docker
-
-- apiVersion: build.openshift.io/v1
-  kind: BuildConfig
-  metadata:
-
-    labels:
-      app: worker
-    name: worker
-  spec:
-    failedBuildsHistoryLimit: 5
-    nodeSelector: null
-    output:
-      to:
-        kind: ImageStreamTag
-        name: worker:latest
-    postCommit: {}
-    resources: {}
-    runPolicy: Serial
-    source:
-      contextDir: worker
-      git:
-        uri: https://github.com/storbel/example-voting-app.git
-      type: Git
-    strategy:
-      type: Docker
-
-- apiVersion: build.openshift.io/v1
-  kind: Build
-  metadata:
-    labels:
-      app: result
-      buildconfig: result
-    name: result
-  spec:
-    nodeSelector: null
-    output:
-        kind: ImageStreamTag
-        name: result:latest
-    source:
-      contextDir: result
-      git:
-        uri: https://github.com/storbel/example-voting-app.git
-      type: Git
-    strategy:
-      type: Docker
-
-- apiVersion: build.openshift.io/v1
-  kind: Build
-  metadata:
-    labels:
-      app: vote
-      buildconfig: vote
-      openshift.io/build-config.name: vote
-      openshift.io/build.start-policy: Serial
-    name: vote
-  spec:
-    nodeSelector: null
-    output:
-      pushSecret:
-        name: builder-dockercfg-9sn6j
-      to:
-        kind: ImageStreamTag
-        name: vote:latest
-
-    source:
-      contextDir: vote
-      git:
-        uri: https://github.com/storbel/example-voting-app.git
-      type: Git
-    strategy:
-      type: Docker
 
 
-- apiVersion: build.openshift.io/v1
-  kind: Build
 
-    labels:
-      app: worker
-      buildconfig: worker
-      openshift.io/build-config.name: worker
-      openshift.io/build.start-policy: Serial
-    name: worker
-  spec:
-    nodeSelector: null
-    output:
-        kind: ImageStreamTag
-        name: worker:latest
-    source:
-      contextDir: worker
-      git:
-        uri: https://github.com/storbel/example-voting-app.git
-      type: Git
-    strategy:
-      type: Docker
-
-
-- apiVersion: image.openshift.io/v1
-  kind: ImageStream
-  metadata:
-    labels:
-      app: worker
-    name: java
-  spec:
-    lookupPolicy:
-      local: false
-    tags:
-    - annotations:
-        openshift.io/imported-from: java:openjdk-8-jdk-alpine
-      from:
-        kind: DockerImage
-        name: docker-registry.default.svc:5000/voting-application/java:openjdk-8-jdk-alpine
-      generation: 2
-      importPolicy: {}
-      name: openjdk-8-jdk-alpine
-      referencePolicy:
-        type: Source
-
-- apiVersion: image.openshift.io/v1
-  kind: ImageStream
-  metadata:
-    labels:
-      app: result
-    name: node
-  spec:
-    lookupPolicy:
-      local: false
-    tags:
-    - annotations:
-        openshift.io/imported-from: node:5.11.0-slim
-      from:
-        kind: DockerImage
-        name: docker-registry.default.svc:5000/voting-application/node:5.11.0-slim
-      generation: 2
-      importPolicy: {}
-      name: 5.11.0-slim
-      referencePolicy:
-        type: Source
-
-- apiVersion: image.openshift.io/v1
-  kind: ImageStream
-  metadata:
-    labels:
-      app: vote
-    name: python
-  spec:
-    lookupPolicy:
-      local: false
-    tags:
-    - annotations:
-        openshift.io/imported-from: python:2.7-alpine
-      from:
-        kind: DockerImage
-        name: docker-registry.default.svc:5000/voting-application/python:2.7-alpine
-      generation: 2
-      importPolicy: {}
-      name: 2.7-alpine
-      referencePolicy:
-        type: Source
-
-- apiVersion: image.openshift.io/v1
-  kind: ImageStream
-  metadata:
-    labels:
-      app: result
-    name: result
-  spec:
-    lookupPolicy:
-      local: false
-    tags:
-    - annotations: null
-      from:
-        kind: DockerImage
-        name: docker-registry.default.svc:5000/voting-application/result:latest
-      generation: null
-      importPolicy: {}
-      name: latest
-      referencePolicy:
-        type: ""
-
-- apiVersion: image.openshift.io/v1
-  kind: ImageStream
-  metadata:
-    labels:
-      app: vote
-    name: vote
-  spec:
-    lookupPolicy:
-      local: false
-    tags:
-    - annotations: null
-      from:
-        kind: DockerImage
-        name: docker-registry.default.svc:5000/voting-application/vote:latest
-      generation: null
-      importPolicy: {}
-      name: latest
-      referencePolicy:
-        type: ""
-  status:
-    dockerImageRepository: ""
-- apiVersion: image.openshift.io/v1
-  kind: ImageStream
-  metadata:
-    labels:
-      app: worker
-    name: worker
-  spec:
-    lookupPolicy:
-      local: false
-    tags:
-    - annotations: null
-      from:
-        kind: DockerImage
-        name: docker-registry.default.svc:5000/voting-application/worker:latest
-      generation: null
-      importPolicy: {}
-      name: latest
-      referencePolicy:
-        type: ""
 
 - apiVersion: route.openshift.io/v1
   kind: Route
